@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minijuego de Preguntas Interactivo</title>
+    <style>
+        /* Estilos generales */
+        body {
+            font-family: sans-serif;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        /* Contenedor principal con diseño de libro */
+        .book-container {
+            display: flex;
+            width: 90%;
+            max-width: 1200px;
+            min-height: 80vh;
+            background-color: #fff;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            border-radius: 10px;
+        }
+
+        /* Estilo para ambas páginas */
+        .page {
+            width: 50%;
+            padding: 40px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Línea divisoria para simular el centro del libro */
+        .left-page {
+            border-right: 1px solid #ddd;
+        }
+
+        .question-content {
+            flex-grow: 1; /* Ocupa el espacio disponible */
+        }
+
+        #question-title {
+            color: #333;
+            border-bottom: 2px solid #007BFF;
+            padding-bottom: 10px;
+        }
+
+        #question-text {
+            font-size: 1.2em;
+            line-height: 1.6;
+            color: #555;
+        }
+
+        /* Sección de calificación */
+        .answer-section {
+            margin: 20px 0;
+        }
+
+        /* --- NUEVA BARRA DE CALIFICACIÓN --- */
+        .rating-bar-container {
+            position: relative;
+            display: flex;
+            width: 100%;
+            height: 40px;
+            background-color: #e9ecef;
+            border-radius: 20px;
+            cursor: pointer;
+            overflow: hidden; /* Para que el relleno no se salga de los bordes redondeados */
+        }
+
+        .rating-bar-fill {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 0; /* Inicia en 0, se modifica con JS */
+            border-radius: 20px;
+            transition: width 0.4s ease-in-out; /* La animación de llenado */
+            z-index: 1;
+            box-sizing: border-box; /* Para que el borde no añada tamaño */
+        }
+
+        /* --- NUEVOS COLORES PARA LA BARRA --- */
+        .rating-bar-fill.color-1 { background-color: #cdff1a; } /* Amarillo Pálido */
+        .rating-bar-fill.color-2 { background-color: #ffe600; } /* Amarillo */
+        .rating-bar-fill.color-3 { background-color: #ff9900; } /* Ámbar */
+        .rating-bar-fill.color-4 { background-color: #ff5e00; } /* Naranja Intenso */
+        .rating-bar-fill.color-5 { background-color: #ff0000; } /* Rojo */
+        /* --- FIN DE NUEVOS COLORES --- */
+
+
+        .rating-bar-segment {
+            flex: 1; /* Cada segmento ocupa el mismo espacio */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-right: 1px solid #ced4da;
+            box-sizing: border-box;
+            z-index: 2; /* Por encima del relleno */
+        }
+
+        .rating-bar-segment:last-child {
+            border-right: none;
+        }
+
+        .rating-bar-segment span {
+            color: #495057;
+            font-weight: bold;
+            transition: color 0.3s;
+        }
+        
+        /* Cambia el color del número cuando la barra pasa por encima */
+        .rating-bar-container.selected .rating-bar-segment.active span {
+            color: rgb(255, 255, 255);
+        }
+        /* --- FIN DE LA BARRA DE CALIFICACIÓN --- */
+
+
+        /* Botones de navegación (Anterior/Siguiente) */
+        .navigation-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        #prev-btn, #next-btn {
+            padding: 10px 20px;
+            border: none;
+            background-color: #28a745;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+        }
+
+        #prev-btn:disabled, #next-btn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        /* Paginación en la parte inferior */
+        .pagination {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            justify-content: center;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+
+        .page-number {
+            width: 30px;
+            height: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 1px solid #ddd;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .page-number:hover {
+            background-color: #f0f0f0;
+        }
+
+        /* Estilo para el número de página actual */
+        .page-number.current {
+            background-color: #007BFF;
+            color: white;
+            border-color: #007BFF;
+        }
+
+        /* Estilo para la página derecha (explicación) */
+        .right-page {
+            background-color: #fdfdfd;
+        }
+
+        #explanation-title {
+            color: #333;
+            font-size: 1.8em;
+        }
+
+        #explanation-text {
+            font-size: 1.1em;
+            line-height: 1.7;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="book-container">
+        <!-- Lado Izquierdo: Preguntas y Navegación -->
+        <div class="page left-page">
+            <div class="question-content">
+                <h2 id="question-title">Pregunta #1</h2>
+                <p id="question-text">Aquí irá el texto de la pregunta.</p>
+            </div>
+
+            <div class="answer-section">
+                <p>Califica del 1 al 5:</p>
+                <!-- Nueva Barra de Calificación Interactiva -->
+                <div class="rating-bar-container" id="rating-bar">
+                    <div class="rating-bar-fill"></div>
+                    <div class="rating-bar-segment" data-value="1"><span>1</span></div>
+                    <div class="rating-bar-segment" data-value="2"><span>2</span></div>
+                    <div class="rating-bar-segment" data-value="3"><span>3</span></div>
+                    <div class="rating-bar-segment" data-value="4"><span>4</span></div>
+                    <div class="rating-bar-segment" data-value="5"><span>5</span></div>
+                </div>
+            </div>
+
+            <div class="navigation-buttons">
+                <button id="prev-btn">Anterior</button>
+                <button id="next-btn">Siguiente</button>
+            </div>
+
+            <div class="pagination" id="pagination">
+                <!-- Los números de paginación se generarán con JavaScript -->
+            </div>
+        </div>
+
+        <!-- Lado Derecho: Explicación -->
+        <div class="page right-page">
+            <h2 id="explanation-title">Título de la Explicación</h2>
+            <p id="explanation-text">
+                Aquí aparecerá una explicación detallada relacionada con la pregunta actual.
+            </p>
+        </div>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // --- 1. DATOS DE LAS PREGUNTAS ---
+        const questions = Array.from({ length: 5 }, (_, i) => ({
+            id: i + 1,
+            questionText: `Este es el texto para la pregunta número ${i + 1}. ¿Qué opinas?`,
+            explanationTitle: `Explicación de la Pregunta ${i + 1}`,
+            explanationText: `Aquí va una descripción detallada sobre el contexto y el propósito de la pregunta ${i + 1}.`,
+            answer: null // Guarda la respuesta del usuario (1-5)
+        }));
+
+        // --- 2. VARIABLES DE ESTADO ---
+        let currentQuestionIndex = 0;
+
+        // --- 3. REFERENCIAS A ELEMENTOS DEL DOM ---
+        const questionTitleEl = document.getElementById('question-title');
+        const questionTextEl = document.getElementById('question-text');
+        const explanationTitleEl = document.getElementById('explanation-title');
+        const explanationTextEl = document.getElementById('explanation-text');
+        const ratingBar = document.getElementById('rating-bar');
+        const ratingBarFill = ratingBar.querySelector('.rating-bar-fill');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const paginationContainer = document.getElementById('pagination');
+
+        // --- 4. FUNCIÓN PRINCIPAL PARA RENDERIZAR LA PREGUNTA ---
+        function renderQuestion(index) {
+            if (index < 0 || index >= questions.length) return;
+
+            currentQuestionIndex = index;
+            const question = questions[index];
+
+            questionTitleEl.textContent = `Pregunta #${question.id}`;
+            questionTextEl.textContent = question.questionText;
+            explanationTitleEl.textContent = question.explanationTitle;
+            explanationTextEl.textContent = question.explanationText;
+
+            // Actualizar la barra de calificación con la respuesta guardada
+            updateRatingBar(question.answer);
+
+            prevBtn.disabled = index === 0;
+            nextBtn.disabled = index === questions.length - 1;
+
+            updatePagination();
+        }
+
+        // --- 5. FUNCIONES AUXILIARES ---
+
+        function createPagination() {
+            questions.forEach((_, index) => {
+                const pageNumber = document.createElement('div');
+                pageNumber.classList.add('page-number');
+                pageNumber.textContent = index + 1;
+                pageNumber.dataset.index = index;
+                paginationContainer.appendChild(pageNumber);
+            });
+        }
+
+        function updatePagination() {
+            const pageNumbers = paginationContainer.querySelectorAll('.page-number');
+            pageNumbers.forEach(pn => {
+                pn.classList.toggle('current', parseInt(pn.dataset.index) === currentQuestionIndex);
+            });
+        }
+        
+        // Función para actualizar la barra de calificación (con animación)
+        function updateRatingBar(value) {
+            const segments = ratingBar.querySelectorAll('.rating-bar-segment');
+            
+            // Limpia clases de color anteriores
+            ratingBarFill.classList.remove('color-1', 'color-2', 'color-3', 'color-4', 'color-5');
+
+            if (value === null) {
+                ratingBarFill.style.width = '0%';
+                ratingBar.classList.remove('selected');
+            } else {
+                // Añade la clase de color correspondiente
+                ratingBarFill.classList.add(`color-${value}`);
+                // La animación se activa al cambiar el ancho
+                ratingBarFill.style.width = `${value * 20}%`;
+                ratingBar.classList.add('selected');
+            }
+
+            // Actualiza el estilo de los números
+            segments.forEach(segment => {
+                const segmentValue = parseInt(segment.dataset.value);
+                segment.classList.toggle('active', value !== null && segmentValue <= value);
+            });
+        }
+
+        // --- 6. MANEJADORES DE EVENTOS ---
+
+        nextBtn.addEventListener('click', () => renderQuestion(currentQuestionIndex + 1));
+        prevBtn.addEventListener('click', () => renderQuestion(currentQuestionIndex - 1));
+
+        paginationContainer.addEventListener('click', (e) => {
+            if (e.target.classList.contains('page-number')) {
+                const index = parseInt(e.target.dataset.index);
+                renderQuestion(index);
+            }
+        });
+        
+        // Guardar respuesta al hacer clic en la barra de calificación
+        ratingBar.addEventListener('click', (e) => {
+            const segment = e.target.closest('.rating-bar-segment');
+            if (segment) {
+                const value = parseInt(segment.dataset.value);
+                questions[currentQuestionIndex].answer = value;
+                updateRatingBar(value); // Llama a la función que activa la animación
+                console.log(`Respuesta para la pregunta ${currentQuestionIndex + 1}: ${value}`);
+            }
+        });
+
+        // --- 7. INICIALIZACIÓN ---
+        createPagination();
+        renderQuestion(0); // Muestra la primera pregunta al cargar
+    });
+    </script>
+</body>
+</html>
