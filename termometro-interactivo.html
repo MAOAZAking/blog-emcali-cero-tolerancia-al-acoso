@@ -36,6 +36,11 @@
             flex-direction: column;
         }
 
+        /* Clase para ocultar elementos */
+        .hidden {
+            display: none !important;
+        }
+
         /* Línea divisoria para simular el centro del libro */
         .left-page {
             border-right: 1px solid #ddd;
@@ -87,11 +92,11 @@
         }
 
         /* --- NUEVOS COLORES PARA LA BARRA --- */
-        .rating-bar-fill.color-1 { background-color: #cdff1a; } /* Amarillo Pálido */
-        .rating-bar-fill.color-2 { background-color: #ffe600; } /* Amarillo */
-        .rating-bar-fill.color-3 { background-color: #ff9900; } /* Ámbar */
-        .rating-bar-fill.color-4 { background-color: #ff5e00; } /* Naranja Intenso */
-        .rating-bar-fill.color-5 { background-color: #ff0000; } /* Rojo */
+        .color-1 { background-color: #cdff1a; } /* Amarillo Pálido */
+        .color-2 { background-color: #ffe600; } /* Amarillo */
+        .color-3 { background-color: #ff9900; } /* Ámbar */
+        .color-4 { background-color: #ff5e00; } /* Naranja Intenso */
+        .color-5 { background-color: #ff0000; } /* Rojo */
         /* --- FIN DE NUEVOS COLORES --- */
 
 
@@ -197,6 +202,46 @@
             line-height: 1.7;
             color: #666;
         }
+
+        /* --- ESTILOS PARA LA VISTA DE RESUMEN --- */
+        #summary-title {
+            color: #333;
+            border-bottom: 2px solid #28a745;
+            padding-bottom: 10px;
+        }
+
+        .summary-bar {
+            display: flex;
+            width: 100%;
+            height: 50px;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 30px 0;
+            border: 1px solid #ccc;
+        }
+
+        .summary-segment {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.2em;
+            text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+        }
+
+        #restart-btn {
+            padding: 12px 25px;
+            border: none;
+            background-color: #007BFF;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.1em;
+            margin-top: 20px;
+            align-self: center; /* Centra el botón */
+        }
     </style>
 </head>
 <body>
@@ -204,22 +249,31 @@
     <div class="book-container">
         <!-- Lado Izquierdo: Preguntas y Navegación -->
         <div class="page left-page">
-            <div class="question-content">
-                <h2 id="question-title">Pregunta #1</h2>
-                <p id="question-text">Aquí irá el texto de la pregunta.</p>
+            <!-- Vista de Preguntas -->
+            <div id="question-view">
+                <div class="question-content">
+                    <h2 id="question-title">Pregunta #1</h2>
+                    <p id="question-text">Aquí irá el texto de la pregunta.</p>
+                </div>
+
+                <div class="answer-section">
+                    <p>Califica del 1 al 5:</p>
+                    <div class="rating-bar-container" id="rating-bar">
+                        <div class="rating-bar-fill"></div>
+                        <div class="rating-bar-segment" data-value="1"><span>1</span></div>
+                        <div class="rating-bar-segment" data-value="2"><span>2</span></div>
+                        <div class="rating-bar-segment" data-value="3"><span>3</span></div>
+                        <div class="rating-bar-segment" data-value="4"><span>4</span></div>
+                        <div class="rating-bar-segment" data-value="5"><span>5</span></div>
+                    </div>
+                </div>
             </div>
 
-            <div class="answer-section">
-                <p>Califica del 1 al 5:</p>
-                <!-- Nueva Barra de Calificación Interactiva -->
-                <div class="rating-bar-container" id="rating-bar">
-                    <div class="rating-bar-fill"></div>
-                    <div class="rating-bar-segment" data-value="1"><span>1</span></div>
-                    <div class="rating-bar-segment" data-value="2"><span>2</span></div>
-                    <div class="rating-bar-segment" data-value="3"><span>3</span></div>
-                    <div class="rating-bar-segment" data-value="4"><span>4</span></div>
-                    <div class="rating-bar-segment" data-value="5"><span>5</span></div>
-                </div>
+            <!-- Vista de Resumen (inicialmente oculta) -->
+            <div id="summary-view" class="hidden">
+                <h2 id="summary-title">Resumen de tus Respuestas</h2>
+                <div class="summary-bar" id="summary-bar"></div>
+                <button id="restart-btn">Reiniciar Cuestionario</button>
             </div>
 
             <div class="navigation-buttons">
@@ -244,13 +298,43 @@
     <script>
     document.addEventListener('DOMContentLoaded', () => {
         // --- 1. DATOS DE LAS PREGUNTAS ---
-        const questions = Array.from({ length: 5 }, (_, i) => ({
-            id: i + 1,
-            questionText: `Este es el texto para la pregunta número ${i + 1}. ¿Qué opinas?`,
-            explanationTitle: `Explicación de la Pregunta ${i + 1}`,
-            explanationText: `Aquí va una descripción detallada sobre el contexto y el propósito de la pregunta ${i + 1}.`,
-            answer: null // Guarda la respuesta del usuario (1-5)
-        }));
+        const questions = [
+            {
+                id: 1,
+                questionText: "¿Has pensado alguna vez que los hombres son naturalmente xzuperiores a las mujeres?",
+                explanationTitle: "Actitudes de superioridad masculina",
+                explanationText: "1. ​¿T​e parece que los hombres son más aptos para liderar en el trabajo o la política que las mujeres?<br>2. ¿Crees que los hombres deben ser siempre los proveedores principales de una familia, mientras que las mujeres deben encargarse del hogar?<br>3. ¿Sientes que los hombres tienen el derecho de tomar decisiones Importantes en la vida de una mujer como su carrera o su vid​a socia​l?<br>4. ¿Plensas que una mujer n​o debería desafiar a un hombre en una conversación o en una situación de poder?<br>5. ¿Te incomoda que una mujer tenga más éxito a reconocimiento en un área tradicionalmente dominada por hombres?",
+                answer: null
+            },
+            {
+                id: 2,
+                questionText: "¿Has ignorado o minimizado las experiencias y emociones de las mujeres?",
+                explanationTitle: "Falta de empatía o comprensión hacia las mujeres",
+                explanationText: "La confianza en el sistema es crucial. Los empleados deben sentir que sus denuncias serán tomadas en serio, investigadas a fondo y manejadas con la máxima confidencialidad para evitar represalias.",
+                answer: null
+            },
+            {
+                id: 3,
+                questionText: "​¿Has utilizado alguna vez términos o frases que refuercen los estereotipos de género?",
+                explanationTitle: "​Uso de lenguaje sexista",
+                explanationText: "Es vital que existan múltiples canales de denuncia (RR.HH., línea ética, un superior de confianza) y que todos los empleados sepan cómo y cuándo utilizarlos sin temor.",
+                answer: null
+            },
+            {
+                id: 4,
+                questionText: "¿Has intentado controlar las decisiones o el comportamiento de una mujer basándote en su rol de género?",
+                explanationTitle: "Control y objetificación de las mujeres",
+                explanationText: "La capacitación continua ayuda a prevenir el acoso al educar a los empleados sobre qué comportamientos son inaceptables, cómo intervenir de manera segura y cuáles son sus derechos y responsabilidades.",
+                answer: null
+            },
+            {
+                id: 5,
+                questionText: "¿Has sentido celos o posesividad hacia las mujeres en tu vida?",
+                explanationTitle: "Celos y posesividad",
+                explanationText: "El ejemplo de los líderes es fundamental. Un compromiso visible desde la alta dirección envía un mensaje poderoso de que el acoso no será tolerado en ningún nivel de la organización.",
+                answer: null
+            }
+        ];
 
         // --- 2. VARIABLES DE ESTADO ---
         let currentQuestionIndex = 0;
@@ -265,6 +349,9 @@
         const prevBtn = document.getElementById('prev-btn');
         const nextBtn = document.getElementById('next-btn');
         const paginationContainer = document.getElementById('pagination');
+        const questionView = document.getElementById('question-view');
+        const summaryView = document.getElementById('summary-view');
+        const restartBtn = document.getElementById('restart-btn');
 
         // --- 4. FUNCIÓN PRINCIPAL PARA RENDERIZAR LA PREGUNTA ---
         function renderQuestion(index) {
@@ -282,7 +369,14 @@
             updateRatingBar(question.answer);
 
             prevBtn.disabled = index === 0;
-            nextBtn.disabled = index === questions.length - 1;
+            // Cambia el texto del botón "Siguiente" en la última pregunta
+            if (index === questions.length - 1) {
+                nextBtn.textContent = 'Generar Resumen';
+                nextBtn.disabled = false; // Asegurarse de que esté habilitado
+            } else {
+                nextBtn.textContent = 'Siguiente';
+                nextBtn.disabled = index === questions.length - 1;
+            }
 
             updatePagination();
         }
@@ -331,9 +425,66 @@
             });
         }
 
+        // Función para mostrar la vista de resumen
+        function showSummary() {
+            // Ocultar vista de preguntas y navegación
+            questionView.classList.add('hidden');
+            paginationContainer.classList.add('hidden');
+            document.querySelector('.navigation-buttons').classList.add('hidden');
+
+            // Mostrar vista de resumen
+            summaryView.classList.remove('hidden');
+
+            // Actualizar página derecha
+            explanationTitleEl.textContent = "Resultados Finales";
+            explanationTextEl.textContent = "Este es un resumen visual de tus respuestas a lo largo del cuestionario. Cada color representa la calificación que diste a la pregunta correspondiente.";
+
+            // Generar la barra de resumen
+            const summaryBar = document.getElementById('summary-bar');
+            summaryBar.innerHTML = ''; // Limpiar contenido anterior
+
+            questions.forEach(q => {
+                const segment = document.createElement('div');
+                segment.classList.add('summary-segment');
+                if (q.answer !== null) {
+                    // Usamos las mismas clases de color que la barra de llenado
+                    segment.classList.add(`color-${q.answer}`);
+                    segment.textContent = q.answer;
+                } else {
+                    segment.textContent = '-'; // Si no hay respuesta
+                    segment.style.backgroundColor = '#e9ecef';
+                    segment.style.color = '#333';
+                }
+                summaryBar.appendChild(segment);
+            });
+        }
+
+        // Función para reiniciar el cuestionario
+        function restartQuiz() {
+            // Limpiar respuestas
+            questions.forEach(q => q.answer = null);
+
+            // Ocultar vista de resumen
+            summaryView.classList.add('hidden');
+
+            // Mostrar vista de preguntas y navegación
+            questionView.classList.remove('hidden');
+            paginationContainer.classList.remove('hidden');
+            document.querySelector('.navigation-buttons').classList.remove('hidden');
+
+            // Volver a la primera pregunta
+            renderQuestion(0);
+        }
+
         // --- 6. MANEJADORES DE EVENTOS ---
 
-        nextBtn.addEventListener('click', () => renderQuestion(currentQuestionIndex + 1));
+        nextBtn.addEventListener('click', () => {
+            if (currentQuestionIndex === questions.length - 1) {
+                showSummary();
+            } else {
+                renderQuestion(currentQuestionIndex + 1);
+            }
+        });
         prevBtn.addEventListener('click', () => renderQuestion(currentQuestionIndex - 1));
 
         paginationContainer.addEventListener('click', (e) => {
@@ -353,6 +504,8 @@
                 console.log(`Respuesta para la pregunta ${currentQuestionIndex + 1}: ${value}`);
             }
         });
+
+        restartBtn.addEventListener('click', restartQuiz);
 
         // --- 7. INICIALIZACIÓN ---
         createPagination();
