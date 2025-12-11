@@ -37,7 +37,7 @@
             background-repeat: no-repeat;
             background-position: center;
             background-size: contain; /* Ajusta la imagen para que quepa completamente */
-            opacity: 0.15;
+            opacity: 0.14;
             z-index: -1; /* Coloca el fondo detrás del contenido */
         }
 
@@ -91,6 +91,7 @@
             border-radius: 20px;
             cursor: pointer;
             overflow: hidden; /* Para que el relleno no se salga de los bordes redondeados */
+            border: 1px solid #777777; /* Borde añadido */
         }
 
         .rating-bar-fill {
@@ -119,7 +120,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            border-right: 1px solid #ced4da;
+            border-right: 1px solid #777777;
             box-sizing: border-box;
             z-index: 2; /* Por encima del relleno */
         }
@@ -163,7 +164,7 @@
         }
 
         #prev-btn:disabled, #next-btn:disabled {
-            background-color: #ccc;
+            background-color: #686868;
             cursor: not-allowed;
         }
 
