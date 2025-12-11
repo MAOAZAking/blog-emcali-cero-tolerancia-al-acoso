@@ -110,14 +110,18 @@
         }
 
         .rating-bar-segment span {
-            color: #495057;
+            color: #000000;
             font-weight: bold;
-            transition: color 0.3s;
         }
         
         /* Cambia el color del número cuando la barra pasa por encima */
         .rating-bar-container.selected .rating-bar-segment.active span {
             color: rgb(255, 255, 255);
+                        /* Añade un reborde negro de 1px para contraste */
+            text-shadow:
+                -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000, /* Diagonales */
+                -1px 0 0 #000, 1px 0 0 #000, 0 -1px 0 #000, 0 1px 0 #000; /* Horizontales y Verticales */
+            transition: color 0.3s;
         }
         /* --- FIN DE LA BARRA DE CALIFICACIÓN --- */
 
