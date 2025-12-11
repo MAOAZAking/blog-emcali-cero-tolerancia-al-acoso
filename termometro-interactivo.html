@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Minijuego de Preguntas Interactivo</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&display=swap" rel="stylesheet">
     <style>
         /* Estilos generales */
         body {
@@ -168,6 +171,38 @@
             cursor: not-allowed;
         }
 
+        /* --- NUEVO: ESTILOS PARA EL TOOLTIP (MENSAJE EMERGENTE) --- */
+        .tooltip-wrapper {
+            position: relative;
+            display: inline-block; /* Necesario para que el tooltip se posicione correctamente */
+        }
+
+        .tooltip-wrapper .tooltip-text {
+            visibility: hidden;
+            width: 180px;
+            background-color: #555;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 8px;
+            position: absolute;
+            z-index: 10;
+            bottom: 115%; /* Posiciona el tooltip encima del botón */
+            left: 50%;
+            margin-left: -90px; /* Centra el tooltip (la mitad de su ancho) */
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none; /* Evita que el tooltip interfiera con el cursor */
+        }
+
+        /* Muestra el tooltip cuando el wrapper tiene la clase 'show-tooltip' */
+        .tooltip-wrapper.show-tooltip .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+        /* --- FIN DE ESTILOS PARA EL TOOLTIP --- */
+
+
         /* Paginación en la parte inferior */
         .pagination {
             display: flex;
@@ -293,7 +328,10 @@
 
             <div class="navigation-buttons">
                 <button id="prev-btn">Anterior</button>
-                <button id="next-btn">Siguiente</button>
+                <div class="tooltip-wrapper" id="next-btn-wrapper">
+                    <button id="next-btn">Siguiente</button>
+                    <span class="tooltip-text">Debes seleccionar algún número</span>
+                </div>
             </div>
 
             <div class="pagination" id="pagination">
@@ -367,6 +405,7 @@
         const questionView = document.getElementById('question-view');
         const summaryView = document.getElementById('summary-view');
         const restartBtn = document.getElementById('restart-btn');
+        const nextBtnWrapper = document.getElementById('next-btn-wrapper');
 
         // --- 4. FUNCIÓN PRINCIPAL PARA RENDERIZAR LA PREGUNTA ---
         function renderQuestion(index) {
@@ -384,14 +423,14 @@
             updateRatingBar(question.answer);
 
             prevBtn.disabled = index === 0;
-            // Cambia el texto del botón "Siguiente" en la última pregunta
+
+            // El botón "Siguiente" o "Generar Resumen" estará deshabilitado si no hay respuesta
             if (index === questions.length - 1) {
                 nextBtn.textContent = 'Generar Resumen';
-                nextBtn.disabled = false; // Asegurarse de que esté habilitado
             } else {
                 nextBtn.textContent = 'Siguiente';
-                nextBtn.disabled = index === questions.length - 1;
             }
+            nextBtn.disabled = question.answer === null;
 
             updatePagination();
         }
@@ -452,7 +491,7 @@
 
             // Actualizar página derecha
             explanationTitleEl.textContent = "";
-            explanationTextEl.innerHTML = "Gracias por regalarte este tiempo para tomar conciencia sobre tu propio pensamiento y conductas.<br>Te invitamos a reflexionar con base a tus respuestas y seguir documentándote sobre este tema tan importante para la sana convivencia en el hogar, trabajo y tu comunidad.";
+            explanationTextEl.innerHTML = "Gracias por regalarte este tiempo para tomar conciencia sobre tu propio pensamiento y conductas.<br>Te invitamos a reflexionar con base a tus respuestas y seguir documentándote sobre este tema tan importante para la sana convivencia en el hogar, trabajo y tu comunidad.<br><br><div style='font-family: \"Honk\", cursive; font-size: 4em; font-weight: bold; text-align: center; background-image: linear-gradient(45deg, #007BFF, #8E44AD); -webkit-background-clip: text; background-clip: text; color: transparent;'>El verdadero cambio comienza desde adentro</div>";
 
             // Generar la barra de resumen
             const summaryBar = document.getElementById('summary-bar');
@@ -494,7 +533,26 @@
         // --- 6. MANEJADORES DE EVENTOS ---
 
         nextBtn.addEventListener('click', () => {
-            if (currentQuestionIndex === questions.length - 1) {
+            const currentQuestion = questions[currentQuestionIndex];
+            // Si no hay respuesta, muestra un mensaje y no avances.
+            if (currentQuestion.answer === null) {
+                const originalTitle = explanationTitleEl.textContent;
+                const originalText = explanationTextEl.innerHTML;
+
+                explanationTitleEl.textContent = "¡Un momento!";
+                explanationTextEl.innerHTML = "Por favor, califica la pregunta actual del 1 al 5 en el panel izquierdo para poder continuar.<br><br>Tu respuesta es importante para completar el ejercicio de reflexión.";
+
+                // Restaura el contenido original después de unos segundos
+                setTimeout(() => {
+                    explanationTitleEl.textContent = originalTitle;
+                    explanationTextEl.innerHTML = originalText;
+                }, 4000); // El mensaje se mostrará por 4 segundos
+
+                return; // Detiene la ejecución para no pasar a la siguiente pregunta
+            }
+
+            // Si hay respuesta, procede normalmente
+            if (currentQuestionIndex === questions.length - 1) { // Si es la última pregunta
                 showSummary();
             } else {
                 renderQuestion(currentQuestionIndex + 1);
@@ -516,9 +574,25 @@
                 const value = parseInt(segment.dataset.value);
                 questions[currentQuestionIndex].answer = value;
                 updateRatingBar(value); // Llama a la función que activa la animación
+                nextBtn.disabled = false; // Habilita el botón de siguiente
                 console.log(`Respuesta para la pregunta ${currentQuestionIndex + 1}: ${value}`);
             }
         });
+
+        // --- NUEVO: MANEJADORES PARA EL TOOLTIP DEL BOTÓN "SIGUIENTE" ---
+        function handleTooltip(show) {
+            // Solo muestra el tooltip si el botón está realmente deshabilitado
+            if (show && nextBtn.disabled) {
+                nextBtnWrapper.classList.add('show-tooltip');
+            } else {
+                nextBtnWrapper.classList.remove('show-tooltip');
+            }
+        }
+
+        // Mostrar en hover (escritorio) o al hacer clic (móvil)
+        nextBtnWrapper.addEventListener('mouseenter', () => handleTooltip(true));
+        nextBtnWrapper.addEventListener('mouseleave', () => handleTooltip(false));
+        nextBtnWrapper.addEventListener('click', () => handleTooltip(true));
 
         restartBtn.addEventListener('click', restartQuiz);
 
