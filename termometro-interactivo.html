@@ -6,7 +6,8 @@
     <title>Minijuego de Preguntas Interactivo</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fugaz+One&display=swap" rel="stylesheet">
+
     <style>
         /* Estilos generales */
         body {
@@ -38,7 +39,6 @@
             top: 0; left: 0; width: 100%; height: 100%;
             background-image: url(https://portalemcali.onrender.com/img/Navbar/Logo.png);
             background-repeat: no-repeat;
-            background-position: center;
             background-size: contain; /* Ajusta la imagen para que quepa completamente */
             opacity: 0.14;
             z-index: -1; /* Coloca el fondo detrás del contenido */
@@ -237,9 +237,16 @@
             border-color: #007BFF;
         }
 
+        /* --- NUEVO: Estilo para paginación deshabilitada --- */
+        .page-number.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
         /* Estilo para la página derecha (explicación) */
         .right-page {
             background-color: transparent; /* Hacer transparente para ver el fondo del contenedor */
+            position: relative; /* Necesario para posicionar el texto del pie de página del resumen */
         }
 
         #explanation-title {
@@ -291,6 +298,21 @@
             font-size: 1.1em;
             margin-top: 20px;
             align-self: center; /* Centra el botón */
+        }
+
+        /* --- NUEVO: ESTILO PARA EL TEXTO FINAL DEL RESUMEN --- */
+        #summary-footer-text {
+            position: absolute;
+            bottom: 40px; /* Alineado con el padding de la página */
+            left: 0;
+            width: 100%;
+            padding: 0 40px; /* Para que coincida con el padding de .page */
+            box-sizing: border-box;
+            font-family: "Fugaz One", cursive;
+            font-size: 2em;
+            font-weight: bold;
+            text-align: center;
+            z-index: 10; /* Por encima de otro contenido */
         }
     </style>
 </head>
@@ -345,6 +367,9 @@
             <p id="explanation-text">
                 Aquí aparecerá una explicación detallada relacionada con la pregunta actual.
             </p>
+        </div>
+        <div id="summary-footer-text" class="hidden">
+                Porque el verdadero cambio <p style="color: #13cc3e;">COMIENZA DESDE ADENTRO</p>
         </div>
     </div>
 
@@ -406,6 +431,7 @@
         const summaryView = document.getElementById('summary-view');
         const restartBtn = document.getElementById('restart-btn');
         const nextBtnWrapper = document.getElementById('next-btn-wrapper');
+        const summaryFooterTextEl = document.getElementById('summary-footer-text');
 
         // --- 4. FUNCIÓN PRINCIPAL PARA RENDERIZAR LA PREGUNTA ---
         function renderQuestion(index) {
@@ -449,8 +475,16 @@
 
         function updatePagination() {
             const pageNumbers = paginationContainer.querySelectorAll('.page-number');
+            let enabled = true; // La primera pregunta siempre está habilitada
             pageNumbers.forEach(pn => {
-                pn.classList.toggle('current', parseInt(pn.dataset.index) === currentQuestionIndex);
+                const index = parseInt(pn.dataset.index);
+                pn.classList.toggle('current', index === currentQuestionIndex);
+
+                // Un número de página está habilitado si la pregunta anterior fue respondida
+                const isEnabled = (index === 0) || questions[index - 1].answer !== null;
+                pn.classList.toggle('disabled', !isEnabled);
+
+
             });
         }
         
@@ -491,10 +525,11 @@
 
             // Actualizar página derecha
             explanationTitleEl.textContent = "";
-            explanationTextEl.innerHTML = "Gracias por regalarte este tiempo para tomar conciencia sobre tu propio pensamiento y conductas.<br>Te invitamos a reflexionar con base a tus respuestas y seguir documentándote sobre este tema tan importante para la sana convivencia en el hogar, trabajo y tu comunidad.<br><br><div style='font-family: \"Honk\", cursive; font-size: 4em; font-weight: bold; text-align: center; background-image: linear-gradient(45deg, #007BFF, #8E44AD); -webkit-background-clip: text; background-clip: text; color: transparent;'>El verdadero cambio comienza desde adentro</div>";
+            explanationTextEl.innerHTML = "Gracias por regalarte este tiempo para tomar conciencia sobre tu propio pensamiento y conductas.<br>Te invitamos a reflexionar con base a tus respuestas y seguir documentándote sobre este tema tan importante para la sana convivencia en el hogar, trabajo y tu comunidad.";
 
             // Generar la barra de resumen
             const summaryBar = document.getElementById('summary-bar');
+            summaryFooterTextEl.classList.remove('hidden'); // Mostrar el texto del pie de página
             summaryBar.innerHTML = ''; // Limpiar contenido anterior
 
             questions.forEach(q => {
@@ -525,6 +560,7 @@
             questionView.classList.remove('hidden');
             paginationContainer.classList.remove('hidden');
             document.querySelector('.navigation-buttons').classList.remove('hidden');
+            summaryFooterTextEl.classList.add('hidden'); // Ocultar el texto del pie de página
 
             // Volver a la primera pregunta
             renderQuestion(0);
@@ -561,7 +597,8 @@
         prevBtn.addEventListener('click', () => renderQuestion(currentQuestionIndex - 1));
 
         paginationContainer.addEventListener('click', (e) => {
-            if (e.target.classList.contains('page-number')) {
+            // Solo permite la navegación si el número de página no está deshabilitado
+            if (e.target.classList.contains('page-number') && !e.target.classList.contains('disabled')) {
                 const index = parseInt(e.target.dataset.index);
                 renderQuestion(index);
             }
