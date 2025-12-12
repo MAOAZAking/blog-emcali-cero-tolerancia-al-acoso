@@ -60,7 +60,7 @@
             display: flex;
             flex-direction: column;
         }
-        
+       
         /* Ocultar resumen y texto final por defecto */
         #summary-view, #summary-footer-text {
             display: none;
@@ -150,7 +150,7 @@
             color: #000000;
             font-weight: bold;
         }
-        
+       
         /* Cambia el color del número cuando la barra pasa por encima */
         .rating-bar-container.selected .rating-bar-segment.active span {
             color: rgb(255, 255, 255);
@@ -483,24 +483,96 @@
             justify-content: space-between;
             margin-bottom: 20px;
         }
+       
+        /* --- LÓGICA DE LA BARRA DE RESUMEN --- */
+        .summary-segment-container {
+            flex: 1;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Ocultar todos los segmentos de respuesta por defecto */
+        .summary-segment-container .summary-segment {
+            display: none;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Mostrar el segmento correcto basado en la respuesta seleccionada */
+        #q1-rating-1:checked ~ div .summary-q1-1,
+        #q1-rating-2:checked ~ div .summary-q1-2,
+        #q1-rating-3:checked ~ div .summary-q1-3,
+        #q1-rating-4:checked ~ div .summary-q1-4,
+        #q1-rating-5:checked ~ div .summary-q1-5,
+        #q2-rating-1:checked ~ div .summary-q2-1,
+        #q2-rating-2:checked ~ div .summary-q2-2,
+        #q2-rating-3:checked ~ div .summary-q2-3,
+        #q2-rating-4:checked ~ div .summary-q2-4,
+        #q2-rating-5:checked ~ div .summary-q2-5,
+        #q3-rating-1:checked ~ div .summary-q3-1,
+        #q3-rating-2:checked ~ div .summary-q3-2,
+        #q3-rating-3:checked ~ div .summary-q3-3,
+        #q3-rating-4:checked ~ div .summary-q3-4,
+        #q3-rating-5:checked ~ div .summary-q3-5,
+        #q4-rating-1:checked ~ div .summary-q4-1,
+        #q4-rating-2:checked ~ div .summary-q4-2,
+        #q4-rating-3:checked ~ div .summary-q4-3,
+        #q4-rating-4:checked ~ div .summary-q4-4,
+        #q4-rating-5:checked ~ div .summary-q4-5,
+        #q5-rating-1:checked ~ div .summary-q5-1,
+        #q5-rating-2:checked ~ div .summary-q5-2,
+        #q5-rating-3:checked ~ div .summary-q5-3,
+        #q5-rating-4:checked ~ div .summary-q5-4,
+        #q5-rating-5:checked ~ div .summary-q5-5 {
+            display: flex;
+        }
+
 
     </style>
 
     <div class="book-container">
         <!-- Lado Izquierdo: Preguntas y Navegación -->
         <div class="page left-page">
+            <!-- Inputs de calificación para todas las preguntas -->
+            <input type="radio" id="q1-rating-1" name="rating-q1" class="rating-input rating-q1 rating-input-1" value="1">
+            <input type="radio" id="q1-rating-2" name="rating-q1" class="rating-input rating-q1 rating-input-2" value="2">
+            <input type="radio" id="q1-rating-3" name="rating-q1" class="rating-input rating-q1 rating-input-3" value="3">
+            <input type="radio" id="q1-rating-4" name="rating-q1" class="rating-input rating-q1 rating-input-4" value="4">
+            <input type="radio" id="q1-rating-5" name="rating-q1" class="rating-input rating-q1 rating-input-5" value="5">
+
+            <input type="radio" id="q2-rating-1" name="rating-q2" class="rating-input rating-q2 rating-input-1" value="1">
+            <input type="radio" id="q2-rating-2" name="rating-q2" class="rating-input rating-q2 rating-input-2" value="2">
+            <input type="radio" id="q2-rating-3" name="rating-q2" class="rating-input rating-q2 rating-input-3" value="3">
+            <input type="radio" id="q2-rating-4" name="rating-q2" class="rating-input rating-q2 rating-input-4" value="4">
+            <input type="radio" id="q2-rating-5" name="rating-q2" class="rating-input rating-q2 rating-input-5" value="5">
+
+            <input type="radio" id="q3-rating-1" name="rating-q3" class="rating-input rating-q3 rating-input-1" value="1">
+            <input type="radio" id="q3-rating-2" name="rating-q3" class="rating-input rating-q3 rating-input-2" value="2">
+            <input type="radio" id="q3-rating-3" name="rating-q3" class="rating-input rating-q3 rating-input-3" value="3">
+            <input type="radio" id="q3-rating-4" name="rating-q3" class="rating-input rating-q3 rating-input-4" value="4">
+            <input type="radio" id="q3-rating-5" name="rating-q3" class="rating-input rating-q3 rating-input-5" value="5">
+
+            <input type="radio" id="q4-rating-1" name="rating-q4" class="rating-input rating-q4 rating-input-1" value="1">
+            <input type="radio" id="q4-rating-2" name="rating-q4" class="rating-input rating-q4 rating-input-2" value="2">
+            <input type="radio" id="q4-rating-3" name="rating-q4" class="rating-input rating-q4 rating-input-3" value="3">
+            <input type="radio" id="q4-rating-4" name="rating-q4" class="rating-input rating-q4 rating-input-4" value="4">
+            <input type="radio" id="q4-rating-5" name="rating-q4" class="rating-input rating-q4 rating-input-5" value="5">
+
+            <input type="radio" id="q5-rating-1" name="rating-q5" class="rating-input rating-q5 rating-input-1" value="1">
+            <input type="radio" id="q5-rating-2" name="rating-q5" class="rating-input rating-q5 rating-input-2" value="2">
+            <input type="radio" id="q5-rating-3" name="rating-q5" class="rating-input rating-q5 rating-input-3" value="3">
+            <input type="radio" id="q5-rating-4" name="rating-q5" class="rating-input rating-q5 rating-input-4" value="4">
+            <input type="radio" id="q5-rating-5" name="rating-q5" class="rating-input rating-q5 rating-input-5" value="5">
+
             <!-- Pregunta 1 -->
             <div class="question-page question-page-1">
                 <div class="question-content">
                     <h2 id="question-title">Pregunta #1</h2>
                     <p id="question-text">¿Has pensado alguna vez que los hombres son naturalmente superiores a las mujeres?</p>
                 </div>
-                <!-- Inputs de calificación para la pregunta 1 -->
-                <input type="radio" id="q1-rating-1" name="rating-q1" class="rating-input rating-q1 rating-input-1" value="1">
-                <input type="radio" id="q1-rating-2" name="rating-q1" class="rating-input rating-q1 rating-input-2" value="2">
-                <input type="radio" id="q1-rating-3" name="rating-q1" class="rating-input rating-q1 rating-input-3" value="3">
-                <input type="radio" id="q1-rating-4" name="rating-q1" class="rating-input rating-q1 rating-input-4" value="4">
-                <input type="radio" id="q1-rating-5" name="rating-q1" class="rating-input rating-q1 rating-input-5" value="5">
                 <div class="answer-section">
                     <p>Califica del 1 al 5:</p>
                     <div class="rating-bar-container">
@@ -529,11 +601,6 @@
                     <h2 id="question-title">Pregunta #2</h2>
                     <p id="question-text">¿Has ignorado o minimizado las experiencias y emociones de las mujeres?</p>
                 </div>
-                <input type="radio" id="q2-rating-1" name="rating-q2" class="rating-input rating-q2 rating-input-1" value="1">
-                <input type="radio" id="q2-rating-2" name="rating-q2" class="rating-input rating-q2 rating-input-2" value="2">
-                <input type="radio" id="q2-rating-3" name="rating-q2" class="rating-input rating-q2 rating-input-3" value="3">
-                <input type="radio" id="q2-rating-4" name="rating-q2" class="rating-input rating-q2 rating-input-4" value="4">
-                <input type="radio" id="q2-rating-5" name="rating-q2" class="rating-input rating-q2 rating-input-5" value="5">
                 <div class="answer-section">
                     <p>Califica del 1 al 5:</p>
                     <div class="rating-bar-container">
@@ -561,11 +628,6 @@
                     <h2 id="question-title">Pregunta #3</h2>
                     <p id="question-text">​¿Has utilizado alguna vez términos o frases que refuercen los estereotipos de género?</p>
                 </div>
-                <input type="radio" id="q3-rating-1" name="rating-q3" class="rating-input rating-q3 rating-input-1" value="1">
-                <input type="radio" id="q3-rating-2" name="rating-q3" class="rating-input rating-q3 rating-input-2" value="2">
-                <input type="radio" id="q3-rating-3" name="rating-q3" class="rating-input rating-q3 rating-input-3" value="3">
-                <input type="radio" id="q3-rating-4" name="rating-q3" class="rating-input rating-q3 rating-input-4" value="4">
-                <input type="radio" id="q3-rating-5" name="rating-q3" class="rating-input rating-q3 rating-input-5" value="5">
                 <div class="answer-section">
                     <p>Califica del 1 al 5:</p>
                     <div class="rating-bar-container">
@@ -593,11 +655,6 @@
                     <h2 id="question-title">Pregunta #4</h2>
                     <p id="question-text">¿Has intentado controlar las decisiones o el comportamiento de una mujer basándote en su rol de género?</p>
                 </div>
-                <input type="radio" id="q4-rating-1" name="rating-q4" class="rating-input rating-q4 rating-input-1" value="1">
-                <input type="radio" id="q4-rating-2" name="rating-q4" class="rating-input rating-q4 rating-input-2" value="2">
-                <input type="radio" id="q4-rating-3" name="rating-q4" class="rating-input rating-q4 rating-input-3" value="3">
-                <input type="radio" id="q4-rating-4" name="rating-q4" class="rating-input rating-q4 rating-input-4" value="4">
-                <input type="radio" id="q4-rating-5" name="rating-q4" class="rating-input rating-q4 rating-input-5" value="5">
                 <div class="answer-section">
                     <p>Califica del 1 al 5:</p>
                     <div class="rating-bar-container">
@@ -625,11 +682,6 @@
                     <h2 id="question-title">Pregunta #5</h2>
                     <p id="question-text">¿Has sentido celos o posesividad hacia las mujeres en tu vida?</p>
                 </div>
-                <input type="radio" id="q5-rating-1" name="rating-q5" class="rating-input rating-q5 rating-input-1" value="1">
-                <input type="radio" id="q5-rating-2" name="rating-q5" class="rating-input rating-q5 rating-input-2" value="2">
-                <input type="radio" id="q5-rating-3" name="rating-q5" class="rating-input rating-q5 rating-input-3" value="3">
-                <input type="radio" id="q5-rating-4" name="rating-q5" class="rating-input rating-q5 rating-input-4" value="4">
-                <input type="radio" id="q5-rating-5" name="rating-q5" class="rating-input rating-q5 rating-input-5" value="5">
                 <div class="answer-section">
                     <p>Califica del 1 al 5:</p>
                     <div class="rating-bar-container">
@@ -653,6 +705,51 @@
 
             <!-- Vista de Resumen (inicialmente oculta) -->
 
+            <div id="summary-view">
+                <h2 id="summary-title">Resumen de tus Respuestas</h2>
+                <div class="summary-bar" id="summary-bar">
+                    <div class="summary-segment-container">
+                        <div class="summary-segment summary-q1-1 color-1">1</div>
+                        <div class="summary-segment summary-q1-2 color-2">2</div>
+                        <div class="summary-segment summary-q1-3 color-3">3</div>
+                        <div class="summary-segment summary-q1-4 color-4">4</div>
+                        <div class="summary-segment summary-q1-5 color-5">5</div>
+                    </div>
+                    <!-- Segmento para Pregunta 2 -->
+                    <div class="summary-segment-container">
+                        <div class="summary-segment summary-q2-1 color-1">1</div>
+                        <div class="summary-segment summary-q2-2 color-2">2</div>
+                        <div class="summary-segment summary-q2-3 color-3">3</div>
+                        <div class="summary-segment summary-q2-4 color-4">4</div>
+                        <div class="summary-segment summary-q2-5 color-5">5</div>
+                    </div>
+                    <!-- Segmento para Pregunta 3 -->
+                    <div class="summary-segment-container">
+                        <div class="summary-segment summary-q3-1 color-1">1</div>
+                        <div class="summary-segment summary-q3-2 color-2">2</div>
+                        <div class="summary-segment summary-q3-3 color-3">3</div>
+                        <div class="summary-segment summary-q3-4 color-4">4</div>
+                        <div class="summary-segment summary-q3-5 color-5">5</div>
+                    </div>
+                    <!-- Segmento para Pregunta 4 -->
+                    <div class="summary-segment-container">
+                        <div class="summary-segment summary-q4-1 color-1">1</div>
+                        <div class="summary-segment summary-q4-2 color-2">2</div>
+                        <div class="summary-segment summary-q4-3 color-3">3</div>
+                        <div class="summary-segment summary-q4-4 color-4">4</div>
+                        <div class="summary-segment summary-q4-5 color-5">5</div>
+                    </div>
+                    <!-- Segmento para Pregunta 5 -->
+                    <div class="summary-segment-container">
+                        <div class="summary-segment summary-q5-1 color-1">1</div>
+                        <div class="summary-segment summary-q5-2 color-2">2</div>
+                        <div class="summary-segment summary-q5-3 color-3">3</div>
+                        <div class="summary-segment summary-q5-4 color-4">4</div>
+                        <div class="summary-segment summary-q5-5 color-5">5</div>
+                    </div>
+                </div>
+                <label for="nav-q1" class="restart-btn">Reiniciar Cuestionario</label>
+            </div>
             <div class="pagination">
                 <label for="nav-q1" class="page-number page-number-1">1</label>
                 <label for="nav-q2" class="page-number page-number-2">2</label>
