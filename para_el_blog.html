@@ -3,6 +3,13 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fugaz+One&display=swap" rel="stylesheet">
 
+    <!-- Inputs para controlar la navegación entre preguntas -->
+    <input type="radio" id="nav-q1" name="nav-question" class="nav-radio" checked>
+    <input type="radio" id="nav-q2" name="nav-question" class="nav-radio">
+    <input type="radio" id="nav-q3" name="nav-question" class="nav-radio">
+    <input type="radio" id="nav-q4" name="nav-question" class="nav-radio">
+    <input type="radio" id="nav-q5" name="nav-question" class="nav-radio">
+    <input type="radio" id="nav-summary" name="nav-question" class="nav-radio">
     <style>
         /* Estilos generales */
         body {
@@ -13,6 +20,11 @@
             align-items: center;
             min-height: 100vh;
             margin: 0;
+        }
+
+        /* Ocultar los radio buttons de navegación */
+        .nav-radio {
+            display: none;
         }
 
         /* Contenedor principal con diseño de libro */
@@ -47,6 +59,12 @@
             box-sizing: border-box;
             display: flex;
             flex-direction: column;
+        }
+        
+        /* Contenedor para las páginas de preguntas (inicialmente ocultas) */
+        .question-page {
+            display: none; /* Oculto por defecto */
+            flex-grow: 1;
         }
 
         /* Clase para ocultar elementos */
@@ -152,13 +170,14 @@
             margin-bottom: 20px;
         }
 
-        #prev-btn, #next-btn {
+        .nav-btn {
             padding: 10px 20px;
             border: none;
             color: white;
             border-radius: 5px;
             cursor: pointer;
             font-size: 1em;
+            text-align: center;
         }
 
         #prev-btn {
@@ -170,7 +189,7 @@
             color: #000;
         }
 
-        #prev-btn:disabled, #next-btn:disabled {
+        .nav-btn.disabled {
             background-color: #686868;
             cursor: not-allowed;
         }
@@ -235,14 +254,14 @@
         }
 
         /* Estilo para el número de página actual */
-        .page-number.current {
+        .page-number.active {
             background-color: #0d5c1f;
             color: rgb(211, 211, 211);
             font-size: 1em;
             border-color: #13cc3e;
         }
 
-        /* --- NUEVO: Estilo para paginación deshabilitada --- */
+        /* Estilo para paginación deshabilitada */
         .page-number.disabled {
             opacity: 0.5;
             cursor: not-allowed;
@@ -252,6 +271,11 @@
         .right-page {
             background-color: transparent; /* Hacer transparente para ver el fondo del contenedor */
             position: relative; /* Necesario para posicionar el texto del pie de página del resumen */
+        }
+
+        /* Ocultar todas las explicaciones por defecto */
+        .explanation-content {
+            display: none;
         }
 
         #explanation-title {
@@ -293,7 +317,7 @@
             text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
         }
 
-        #restart-btn {
+        .restart-btn {
             padding: 12px 25px;
             border: none;
             background: linear-gradient(to bottom right, #13cc3e, #0d5c1f);
@@ -320,27 +344,297 @@
             text-align: center;
             z-index: 10; /* Por encima de otro contenido */
         }
+
+        /* --- LÓGICA DE VISIBILIDAD CON CSS --- */
+
+        /* Mostrar la pregunta y explicación correspondiente a la navegación */
+        #nav-q1:checked ~ .book-container .question-page-1,
+        #nav-q2:checked ~ .book-container .question-page-2,
+        #nav-q3:checked ~ .book-container .question-page-3,
+        #nav-q4:checked ~ .book-container .question-page-4,
+        #nav-q5:checked ~ .book-container .question-page-5,
+        #nav-summary:checked ~ .book-container #summary-view {
+            display: flex;
+            flex-direction: column;
+        }
+
+        #nav-q1:checked ~ .book-container .explanation-1,
+        #nav-q2:checked ~ .book-container .explanation-2,
+        #nav-q3:checked ~ .book-container .explanation-3,
+        #nav-q4:checked ~ .book-container .explanation-4,
+        #nav-q5:checked ~ .book-container .explanation-5,
+        #nav-summary:checked ~ .book-container .explanation-summary {
+            display: block;
+        }
+
+        /* Ocultar navegación en el resumen */
+        #nav-summary:checked ~ .book-container .navigation-buttons,
+        #nav-summary:checked ~ .book-container .pagination {
+            display: none;
+        }
+
+        /* Mostrar texto de pie de página en el resumen */
+        #nav-summary:checked ~ .book-container #summary-footer-text {
+            display: block;
+        }
+
+        /* Lógica de la barra de calificación y habilitación del botón "Siguiente" */
+        .question-page .rating-input { display: none; }
+
+        /* Ocultar el botón "Siguiente" real por defecto */
+        .next-btn-real { display: none; }
+
+        /* Cuando se selecciona una respuesta, se muestra el botón "Siguiente" real y se oculta el tooltip */
+        .question-page input[class^="rating-q"]:checked ~ .navigation-buttons .next-btn-real {
+            display: inline-block;
+        }
+        .question-page input[class^="rating-q"]:checked ~ .navigation-buttons .tooltip-wrapper {
+            display: none;
+        }
+
+        /* Colorear la barra de calificación según la respuesta */
+        .rating-input-1:checked ~ .answer-section .rating-bar-container .rating-bar-fill { width: 20%; background-color: #cdff1a; }
+        .rating-input-2:checked ~ .answer-section .rating-bar-container .rating-bar-fill { width: 40%; background-color: #ffe600; }
+        .rating-input-3:checked ~ .answer-section .rating-bar-container .rating-bar-fill { width: 60%; background-color: #ff9900; }
+        .rating-input-4:checked ~ .answer-section .rating-bar-container .rating-bar-fill { width: 80%; background-color: #ff5e00; }
+        .rating-input-5:checked ~ .answer-section .rating-bar-container .rating-bar-fill { width: 100%; background-color: #ff0000; }
+
+        /* Cambiar color de los números de la barra */
+        .rating-input:checked ~ .answer-section .rating-bar-container {
+            --rating-value: 0;
+        }
+        .rating-input-1:checked ~ .answer-section .rating-bar-container { --rating-value: 1; }
+        .rating-input-2:checked ~ .answer-section .rating-bar-container { --rating-value: 2; }
+        .rating-input-3:checked ~ .answer-section .rating-bar-container { --rating-value: 3; }
+        .rating-input-4:checked ~ .answer-section .rating-bar-container { --rating-value: 4; }
+        .rating-input-5:checked ~ .answer-section .rating-bar-container { --rating-value: 5; }
+
+        .rating-bar-container .rating-bar-segment.active span {
+             color: rgb(255, 255, 255);
+             text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000, -1px 0 0 #000, 1px 0 0 #000, 0 -1px 0 #000, 0 1px 0 #000;
+             transition: color 0.3s;
+        }
+
+        .rating-input-1:checked ~ .answer-section .rating-bar-container .rating-bar-segment[data-value="1"],
+        .rating-input-2:checked ~ .answer-section .rating-bar-container .rating-bar-segment[data-value="1"],
+        .rating-input-2:checked ~ .answer-section .rating-bar-container .rating-bar-segment[data-value="2"],
+        .rating-input-3:checked ~ .answer-section .rating-bar-container .rating-bar-segment[data-value="1"],
+        .rating-input-3:checked ~ .answer-section .rating-bar-container .rating-bar-segment[data-value="2"],
+        .rating-input-3:checked ~ .answer-section .rating-bar-container .rating-bar-segment[data-value="3"],
+        .rating-input-4:checked ~ .answer-section .rating-bar-container .rating-bar-segment[data-value="1"],
+        .rating-input-4:checked ~ .answer-section .rating-bar-container .rating-bar-segment[data-value="2"],
+        .rating-input-4:checked ~ .answer-section .rating-bar-container .rating-bar-segment[data-value="3"],
+        .rating-input-4:checked ~ .answer-section .rating-bar-container .rating-bar-segment[data-value="4"],
+        .rating-input-5:checked ~ .answer-section .rating-bar-container .rating-bar-segment[data-value="1"],
+        .rating-input-5:checked ~ .answer-section .rating-bar-container .rating-bar-segment[data-value="2"],
+        .rating-input-5:checked ~ .answer-section .rating-bar-container .rating-bar-segment[data-value="3"],
+        .rating-input-5:checked ~ .answer-section .rating-bar-container .rating-bar-segment[data-value="4"],
+        .rating-input-5:checked ~ .answer-section .rating-bar-container .rating-bar-segment[data-value="5"] {
+            color: white;
+        }
+        .rating-input-1:checked ~ .answer-section .rating-bar-container .rating-bar-segment[data-value="1"] span,
+        .rating-input-2:checked ~ .answer-section .rating-bar-container .rating-bar-segment[data-value="1"] span,
+        .rating-input-2:checked ~ .answer-section .rating-bar-container .rating-bar-segment[data-value="2"] span,
+        .rating-input-3:checked ~ .answer-section .rating-bar-container .rating-bar-segment[data-value="1"] span,
+        .rating-input-3:checked ~ .answer-section .rating-bar-container .rating-bar-segment[data-value="2"] span,
+        .rating-input-3:checked ~ .answer-section .rating-bar-container .rating-bar-segment[data-value="3"] span,
+        .rating-input-4:checked ~ .answer-section .rating-bar-container .rating-bar-segment[data-value="1"] span,
+        .rating-input-4:checked ~ .answer-section .rating-bar-container .rating-bar-segment[data-value="2"] span,
+        .rating-input-4:checked ~ .answer-section .rating-bar-container .rating-bar-segment[data-value="3"] span,
+        .rating-input-4:checked ~ .answer-section .rating-bar-container .rating-bar-segment[data-value="4"] span,
+        .rating-input-5:checked ~ .answer-section .rating-bar-container .rating-bar-segment[data-value="1"] span,
+        .rating-input-5:checked ~ .answer-section .rating-bar-container .rating-bar-segment[data-value="2"] span,
+        .rating-input-5:checked ~ .answer-section .rating-bar-container .rating-bar-segment[data-value="3"] span,
+        .rating-input-5:checked ~ .answer-section .rating-bar-container .rating-bar-segment[data-value="4"] span,
+        .rating-input-5:checked ~ .answer-section .rating-bar-container .rating-bar-segment[data-value="5"] span {
+            color: white;
+            text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+        }
+
+        /* Lógica de paginación */
+        .pagination .page-number { display: none; } /* Ocultar todos por defecto */
+
+        /* Mostrar siempre el primer número */
+        #nav-q1:checked ~ .book-container .pagination .page-number-1 { display: flex; }
+        #nav-q1:checked ~ .book-container .pagination .page-number-1 { background-color: #0d5c1f; color: white; border-color: #13cc3e; }
+
+        /* Lógica para Q2 */
+        .question-page-1 input.rating-q1:checked ~ .pagination .page-number-2 { display: flex; }
+        #nav-q2:checked ~ .book-container .pagination .page-number-1,
+        #nav-q2:checked ~ .book-container .pagination .page-number-2 { display: flex; }
+        #nav-q2:checked ~ .book-container .pagination .page-number-2 { background-color: #0d5c1f; color: white; border-color: #13cc3e; }
+
+        /* Lógica para Q3 */
+        .question-page-2 input.rating-q2:checked ~ .pagination .page-number-3 { display: flex; }
+        #nav-q3:checked ~ .book-container .pagination .page-number-1,
+        #nav-q3:checked ~ .book-container .pagination .page-number-2,
+        #nav-q3:checked ~ .book-container .pagination .page-number-3 { display: flex; }
+        #nav-q3:checked ~ .book-container .pagination .page-number-3 { background-color: #0d5c1f; color: white; border-color: #13cc3e; }
+
+        /* Lógica para Q4 */
+        .question-page-3 input.rating-q3:checked ~ .pagination .page-number-4 { display: flex; }
+        #nav-q4:checked ~ .book-container .pagination .page-number-1,
+        #nav-q4:checked ~ .book-container .pagination .page-number-2,
+        #nav-q4:checked ~ .book-container .pagination .page-number-3,
+        #nav-q4:checked ~ .book-container .pagination .page-number-4 { display: flex; }
+        #nav-q4:checked ~ .book-container .pagination .page-number-4 { background-color: #0d5c1f; color: white; border-color: #13cc3e; }
+
+        /* Lógica para Q5 */
+        .question-page-4 input.rating-q4:checked ~ .pagination .page-number-5 { display: flex; }
+        #nav-q5:checked ~ .book-container .pagination .page-number-1,
+        #nav-q5:checked ~ .book-container .pagination .page-number-2,
+        #nav-q5:checked ~ .book-container .pagination .page-number-3,
+        #nav-q5:checked ~ .book-container .pagination .page-number-4,
+        #nav-q5:checked ~ .book-container .pagination .page-number-5 { display: flex; }
+        #nav-q5:checked ~ .book-container .pagination .page-number-5 { background-color: #0d5c1f; color: white; border-color: #13cc3e; }
+
+        /* Ocultar botones de navegación específicos */
+        .prev-btn-q1, .next-btn-q5 { display: none !important; }
+
+        #nav-q1:checked ~ .book-container .prev-btn-q1,
+        #nav-q2:checked ~ .book-container .prev-btn-q2,
+        #nav-q3:checked ~ .book-container .prev-btn-q3,
+        #nav-q4:checked ~ .book-container .prev-btn-q4,
+        #nav-q5:checked ~ .book-container .prev-btn-q5 {
+            display: none;
+        }
+
+        #nav-q1:checked ~ .book-container .nav-group-q1,
+        #nav-q2:checked ~ .book-container .nav-group-q2,
+        #nav-q3:checked ~ .book-container .nav-group-q3,
+        #nav-q4:checked ~ .book-container .nav-group-q4,
+        #nav-q5:checked ~ .book-container .nav-group-q5 {
+            display: flex;
+        }
+
+        .navigation-buttons {
+            display: none; /* Ocultar todos los grupos de botones */
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
     </style>
 
     <div class="book-container">
         <!-- Lado Izquierdo: Preguntas y Navegación -->
         <div class="page left-page">
-            <!-- Vista de Preguntas -->
-            <div id="question-view">
+            <!-- Pregunta 1 -->
+            <div class="question-page question-page-1">
                 <div class="question-content">
                     <h2 id="question-title">Pregunta #1</h2>
-                    <p id="question-text">Aquí irá el texto de la pregunta.</p>
+                    <p id="question-text">¿Has pensado alguna vez que los hombres son naturalmente superiores a las mujeres?</p>
                 </div>
-
+                <!-- Inputs de calificación para la pregunta 1 -->
+                <input type="radio" id="q1-rating-1" name="rating-q1" class="rating-input rating-q1 rating-input-1" value="1">
+                <input type="radio" id="q1-rating-2" name="rating-q1" class="rating-input rating-q1 rating-input-2" value="2">
+                <input type="radio" id="q1-rating-3" name="rating-q1" class="rating-input rating-q1 rating-input-3" value="3">
+                <input type="radio" id="q1-rating-4" name="rating-q1" class="rating-input rating-q1 rating-input-4" value="4">
+                <input type="radio" id="q1-rating-5" name="rating-q1" class="rating-input rating-q1 rating-input-5" value="5">
                 <div class="answer-section">
                     <p>Califica del 1 al 5:</p>
-                    <div class="rating-bar-container" id="rating-bar">
+                    <div class="rating-bar-container">
                         <div class="rating-bar-fill"></div>
-                        <div class="rating-bar-segment" data-value="1"><span>1</span></div>
-                        <div class="rating-bar-segment" data-value="2"><span>2</span></div>
-                        <div class="rating-bar-segment" data-value="3"><span>3</span></div>
-                        <div class="rating-bar-segment" data-value="4"><span>4</span></div>
-                        <div class="rating-bar-segment" data-value="5"><span>5</span></div>
+                        <label for="q1-rating-1" class="rating-bar-segment" data-value="1"><span>1</span></label>
+                        <label for="q1-rating-2" class="rating-bar-segment" data-value="2"><span>2</span></label>
+                        <label for="q1-rating-3" class="rating-bar-segment" data-value="3"><span>3</span></label>
+                        <label for="q1-rating-4" class="rating-bar-segment" data-value="4"><span>4</span></label>
+                        <label for="q1-rating-5" class="rating-bar-segment" data-value="5"><span>5</span></label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pregunta 2 -->
+            <div class="question-page question-page-2">
+                <div class="question-content">
+                    <h2 id="question-title">Pregunta #2</h2>
+                    <p id="question-text">¿Has ignorado o minimizado las experiencias y emociones de las mujeres?</p>
+                </div>
+                <input type="radio" id="q2-rating-1" name="rating-q2" class="rating-input rating-q2 rating-input-1" value="1">
+                <input type="radio" id="q2-rating-2" name="rating-q2" class="rating-input rating-q2 rating-input-2" value="2">
+                <input type="radio" id="q2-rating-3" name="rating-q2" class="rating-input rating-q2 rating-input-3" value="3">
+                <input type="radio" id="q2-rating-4" name="rating-q2" class="rating-input rating-q2 rating-input-4" value="4">
+                <input type="radio" id="q2-rating-5" name="rating-q2" class="rating-input rating-q2 rating-input-5" value="5">
+                <div class="answer-section">
+                    <p>Califica del 1 al 5:</p>
+                    <div class="rating-bar-container">
+                        <div class="rating-bar-fill"></div>
+                        <label for="q2-rating-1" class="rating-bar-segment" data-value="1"><span>1</span></label>
+                        <label for="q2-rating-2" class="rating-bar-segment" data-value="2"><span>2</span></label>
+                        <label for="q2-rating-3" class="rating-bar-segment" data-value="3"><span>3</span></label>
+                        <label for="q2-rating-4" class="rating-bar-segment" data-value="4"><span>4</span></label>
+                        <label for="q2-rating-5" class="rating-bar-segment" data-value="5"><span>5</span></label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pregunta 3 -->
+            <div class="question-page question-page-3">
+                <div class="question-content">
+                    <h2 id="question-title">Pregunta #3</h2>
+                    <p id="question-text">​¿Has utilizado alguna vez términos o frases que refuercen los estereotipos de género?</p>
+                </div>
+                <input type="radio" id="q3-rating-1" name="rating-q3" class="rating-input rating-q3 rating-input-1" value="1">
+                <input type="radio" id="q3-rating-2" name="rating-q3" class="rating-input rating-q3 rating-input-2" value="2">
+                <input type="radio" id="q3-rating-3" name="rating-q3" class="rating-input rating-q3 rating-input-3" value="3">
+                <input type="radio" id="q3-rating-4" name="rating-q3" class="rating-input rating-q3 rating-input-4" value="4">
+                <input type="radio" id="q3-rating-5" name="rating-q3" class="rating-input rating-q3 rating-input-5" value="5">
+                <div class="answer-section">
+                    <p>Califica del 1 al 5:</p>
+                    <div class="rating-bar-container">
+                        <div class="rating-bar-fill"></div>
+                        <label for="q3-rating-1" class="rating-bar-segment" data-value="1"><span>1</span></label>
+                        <label for="q3-rating-2" class="rating-bar-segment" data-value="2"><span>2</span></label>
+                        <label for="q3-rating-3" class="rating-bar-segment" data-value="3"><span>3</span></label>
+                        <label for="q3-rating-4" class="rating-bar-segment" data-value="4"><span>4</span></label>
+                        <label for="q3-rating-5" class="rating-bar-segment" data-value="5"><span>5</span></label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pregunta 4 -->
+            <div class="question-page question-page-4">
+                <div class="question-content">
+                    <h2 id="question-title">Pregunta #4</h2>
+                    <p id="question-text">¿Has intentado controlar las decisiones o el comportamiento de una mujer basándote en su rol de género?</p>
+                </div>
+                <input type="radio" id="q4-rating-1" name="rating-q4" class="rating-input rating-q4 rating-input-1" value="1">
+                <input type="radio" id="q4-rating-2" name="rating-q4" class="rating-input rating-q4 rating-input-2" value="2">
+                <input type="radio" id="q4-rating-3" name="rating-q4" class="rating-input rating-q4 rating-input-3" value="3">
+                <input type="radio" id="q4-rating-4" name="rating-q4" class="rating-input rating-q4 rating-input-4" value="4">
+                <input type="radio" id="q4-rating-5" name="rating-q4" class="rating-input rating-q4 rating-input-5" value="5">
+                <div class="answer-section">
+                    <p>Califica del 1 al 5:</p>
+                    <div class="rating-bar-container">
+                        <div class="rating-bar-fill"></div>
+                        <label for="q4-rating-1" class="rating-bar-segment" data-value="1"><span>1</span></label>
+                        <label for="q4-rating-2" class="rating-bar-segment" data-value="2"><span>2</span></label>
+                        <label for="q4-rating-3" class="rating-bar-segment" data-value="3"><span>3</span></label>
+                        <label for="q4-rating-4" class="rating-bar-segment" data-value="4"><span>4</span></label>
+                        <label for="q4-rating-5" class="rating-bar-segment" data-value="5"><span>5</span></label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pregunta 5 -->
+            <div class="question-page question-page-5">
+                <div class="question-content">
+                    <h2 id="question-title">Pregunta #5</h2>
+                    <p id="question-text">¿Has sentido celos o posesividad hacia las mujeres en tu vida?</p>
+                </div>
+                <input type="radio" id="q5-rating-1" name="rating-q5" class="rating-input rating-q5 rating-input-1" value="1">
+                <input type="radio" id="q5-rating-2" name="rating-q5" class="rating-input rating-q5 rating-input-2" value="2">
+                <input type="radio" id="q5-rating-3" name="rating-q5" class="rating-input rating-q5 rating-input-3" value="3">
+                <input type="radio" id="q5-rating-4" name="rating-q5" class="rating-input rating-q5 rating-input-4" value="4">
+                <input type="radio" id="q5-rating-5" name="rating-q5" class="rating-input rating-q5 rating-input-5" value="5">
+                <div class="answer-section">
+                    <p>Califica del 1 al 5:</p>
+                    <div class="rating-bar-container">
+                        <div class="rating-bar-fill"></div>
+                        <label for="q5-rating-1" class="rating-bar-segment" data-value="1"><span>1</span></label>
+                        <label for="q5-rating-2" class="rating-bar-segment" data-value="2"><span>2</span></label>
+                        <label for="q5-rating-3" class="rating-bar-segment" data-value="3"><span>3</span></label>
+                        <label for="q5-rating-4" class="rating-bar-segment" data-value="4"><span>4</span></label>
+                        <label for="q5-rating-5" class="rating-bar-segment" data-value="5"><span>5</span></label>
                     </div>
                 </div>
             </div>
@@ -349,301 +643,94 @@
             <div id="summary-view" class="hidden">
                 <h2 id="summary-title">Resumen de tus Respuestas</h2>
                 <div class="summary-bar" id="summary-bar"></div>
-                <button id="restart-btn">Reiniciar Cuestionario</button>
+                <a href="" class="restart-btn nav-btn">Reiniciar Cuestionario</a>
             </div>
 
-            <div class="navigation-buttons">
-                <button id="prev-btn">Anterior</button>
-                <div class="tooltip-wrapper" id="next-btn-wrapper">
-                    <button id="next-btn">Siguiente</button>
+            <!-- Grupos de botones de navegación -->
+            <div class="navigation-buttons nav-group-q1">
+                <span class="nav-btn disabled" id="prev-btn">Anterior</span>
+                <div class="tooltip-wrapper">
+                    <span class="nav-btn disabled">Siguiente</span>
                     <span class="tooltip-text">Debes seleccionar algún número</span>
                 </div>
+                <label for="nav-q2" class="nav-btn next-btn-real" id="next-btn">Siguiente</label>
+            </div>
+            <div class="navigation-buttons nav-group-q2">
+                <label for="nav-q1" class="nav-btn" id="prev-btn">Anterior</label>
+                <div class="tooltip-wrapper">
+                    <span class="nav-btn disabled">Siguiente</span>
+                    <span class="tooltip-text">Debes seleccionar algún número</span>
+                </div>
+                <label for="nav-q3" class="nav-btn next-btn-real" id="next-btn">Siguiente</label>
+            </div>
+            <div class="navigation-buttons nav-group-q3">
+                <label for="nav-q2" class="nav-btn" id="prev-btn">Anterior</label>
+                <div class="tooltip-wrapper">
+                    <span class="nav-btn disabled">Siguiente</span>
+                    <span class="tooltip-text">Debes seleccionar algún número</span>
+                </div>
+                <label for="nav-q4" class="nav-btn next-btn-real" id="next-btn">Siguiente</label>
+            </div>
+            <div class="navigation-buttons nav-group-q4">
+                <label for="nav-q3" class="nav-btn" id="prev-btn">Anterior</label>
+                <div class="tooltip-wrapper">
+                    <span class="nav-btn disabled">Siguiente</span>
+                    <span class="tooltip-text">Debes seleccionar algún número</span>
+                </div>
+                <label for="nav-q5" class="nav-btn next-btn-real" id="next-btn">Siguiente</label>
+            </div>
+            <div class="navigation-buttons nav-group-q5">
+                <label for="nav-q4" class="nav-btn" id="prev-btn">Anterior</label>
+                <div class="tooltip-wrapper">
+                    <span class="nav-btn disabled">Generar Resumen</span>
+                    <span class="tooltip-text">Debes seleccionar algún número</span>
+                </div>
+                <label for="nav-summary" class="nav-btn next-btn-real" id="next-btn">Generar Resumen</label>
             </div>
 
-            <div class="pagination" id="pagination">
-                <!-- Los números de paginación se generarán con JavaScript -->
+            <div class="pagination">
+                <label for="nav-q1" class="page-number page-number-1">1</label>
+                <label for="nav-q2" class="page-number page-number-2">2</label>
+                <label for="nav-q3" class="page-number page-number-3">3</label>
+                <label for="nav-q4" class="page-number page-number-4">4</label>
+                <label for="nav-q5" class="page-number page-number-5">5</label>
             </div>
         </div>
 
         <!-- Lado Derecho: Explicación -->
         <div class="page right-page">
-            <h2 id="explanation-title">Título de la Explicación</h2>
-            <p id="explanation-text">
-                Aquí aparecerá una explicación detallada relacionada con la pregunta actual.
-            </p>
+            <!-- Explicación 1 -->
+            <div class="explanation-content explanation-1">
+                <h2 id="explanation-title">Actitudes de superioridad masculina</h2>
+                <p id="explanation-text">​<b style='font-size: 1.4em'>1.</b> ​¿T​e parece que los hombres son más aptos para liderar en el trabajo o la política que las mujeres?<br>​<b style='font-size: 1.4em'>2.</b> ¿Crees que los hombres deben ser siempre los proveedores principales de una familia, mientras que las mujeres deben encargarse del hogar?<br>​<b style='font-size: 1.4em'>3.</b> ¿Sientes que los hombres tienen el derecho de tomar decisiones importantes en la vida de una mujer (como su carrera o su vid​a socia​l)?<br>​<b style='font-size: 1.4em'>4.</b> ¿Plensas que una mujer n​o debería desafiar a un hombre en una conversación o en una situación de poder?<br>​<b style='font-size: 1.4em'>5.</b> ¿Te incomoda que una mujer tenga más éxito a reconocimiento en un área tradicionalmente dominada por hombres?</p>
+            </div>
+            <!-- Explicación 2 -->
+            <div class="explanation-content explanation-2">
+                <h2 id="explanation-title">Falta de empatía o comprensión hacia las mujeres</h2>
+                <p id="explanation-text">​<b style='font-size: 1.4em'>1.</b> ¿Te ha pasado alguna vez que no prestamos atención a lo que una mujer está diciendo, porque no crees que sea tan importante?<br>​<b style='font-size: 1.4em'>2.</b> ¿Tiendes a minimizar los problemas o preocupaciones de las mujeres en tu vida, como si no fueran tan serias o urgentes como los de los hombres?<br>​<b style='font-size: 1.4em'>3.</b> ¿Cuándo una mujer expresa molestia o tristeza, sueles pensar que está exagerando o actuando de forma irracional?<br>​<b style='font-size: 1.4em'>4.</b> ¿En una discusión, has interrumpido a una mujer para 'corregir' su opinión, sin darle espacio para que termine de expresar sus pensamientos?<br>​<b style='font-size: 1.4em'>5.</b> ¿Crees que las mujeres deben ser más 'razonables' o 'controladas' en sus reacciones emocionales, mientras que se toleran más las explosiones emocionales de los hombres?</p>
+            </div>
+            <!-- Explicación 3 -->
+            <div class="explanation-content explanation-3">
+                <h2 id="explanation-title">​Uso de lenguaje sexista</h2>
+                <p id="explanation-text">​<b style='font-size: 1.4em'>1.</b> ¿Has utilizado alguna vez términos despectivos para referirse a las mujeres, como ​'histérica​' o ​'deberías estar en la cocina​'?<br>​<b style='font-size: 1.4em'>2.</b> ¿Tienes comentarios sobre la apariencia física de las mujeres que las reducen a objetos o algo superficial?<br>​<b style='font-size: 1.4em'>3.</b> ¿Te has sentido cómodo haciendo bromas o chistes sexistas sobre las mujeres en tu círculo social?<br>​<b style='font-size: 1.4em'>4.</b> ¿Consideras que hay frases que, aunque no sean ​'malas​', pueden hacer sentir a las mujeres menospreciadas, como ​'las chicas no saben de fútbol​' o ​'tú eres muy sensible para eso​'?<br>​<b style='font-size: 1.4em'>5.</b> ¿Alguna vez has ridiculizado a una mujer por no cumplir con los estándares tradicionales de belleza o feminidad en tu conversación diaria?</p>
+            </div>
+            <!-- Explicación 4 -->
+            <div class="explanation-content explanation-4">
+                <h2 id="explanation-title">Control y objetificación de las mujeres</h2>
+                <p id="explanation-text">​<b style='font-size: 1.4em'>1.</b> ¿Alguna vez has tomado decisiones importantes por una mujer sin preguntarle su opinión, pensando que sabías que era lo mejor para ella?<br>​<b style='font-size: 1.4em'>2.</b> ¿Te has sentido con derecho a opinar sobre cómo una mujer debe vestir, lo que debe hacer o cómo debe comportarse, dependiendo de su entorno o la situación?<br>​<b style='font-size: 1.4em'>3.</b> ¿Has intentado influir en las decisiones profesionales de una mujer, como su elección de carrera, pensando que debería elegir algo ​'más adecuado​' para una mujer?<br>​<b style='font-size: 1.4em'>4.</b> ¿Piensas que las mujeres deben comportarse de una manera más ​'tradicional​' (por ejemplo, ser más sumis​as o reservadas) para que no se les critique?<br>​<b style='font-size: 1.4em'>5.</b> ¿Te parece que una mujer que toma decisiones independientes sobre su vida o su cuerpo está actuando de forma ​'incorrecta​' o desafiante hacia las normas?</p>
+            </div>
+            <!-- Explicación 5 -->
+            <div class="explanation-content explanation-5">
+                <h2 id="explanation-title">Celos y posesividad</h2>
+                <p id="explanation-text">​​<b style='font-size: 1.4em'>1.</b> ¿Te molesta que una mujer pase tiempo con amigos o familiares sin tu presencia, sintiendo que no es apropiado?​<br>​<b style='font-size: 1.4em'>2.</b> ¿Sientes celos cuando una mujer tiene éxito o es admirada por otras personas, especialmente si no está relacionada contigo?​<br>​<b style='font-size: 1.4em'>3.</b> ¿Controlas las actividades de una mujer, como qué amigos pueden ver o qué lugares pueden visitar, sin darle espacio para su autonomía?<br>​<b style='font-size: 1.4em'>4.</b> ¿Tiendes a ser desconfiado hacia las mujeres que muestran Independencia a que pasan tiempo lejos de ti?​<br>​<b style='font-size: 1.4em'>5.</b> ¿Crees que es natural que un hombre se sienta celoso ​o posesivo si una mujer tiene una vida social activa o si le presta​ atención a otros hombres?</p>
+            </div>
+            <!-- Explicación del Resumen -->
+            <div class="explanation-content explanation-summary">
+                <p id="explanation-text"><b style='font-size: 1.6em;'>Gracias por regalarte este tiempo para tomar conciencia sobre tu propio pensamiento y conductas.<br>Te invitamos a reflexionar con base a tus respuestas y seguir documentándote sobre este tema tan importante para la sana convivencia en el hogar, trabajo y tu comunidad.</b></p>
+            </div>
         </div>
         <div id="summary-footer-text" class="hidden">
                 Porque el verdadero cambio <span style="color: #13cc3e;">COMIENZA DESDE ADENTRO</span>
         </div>
     </div>
-
-    <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        // --- 1. DATOS DE LAS PREGUNTAS ---
-        const questions = [
-            {
-                id: 1,
-                questionText: "¿Has pensado alguna vez que los hombres son naturalmente superiores a las mujeres?",
-                explanationTitle: "Actitudes de superioridad masculina",
-                explanationText: "​<b style='font-size: 1.4em'>1.</b> ​¿T​e parece que los hombres son más aptos para liderar en el trabajo o la política que las mujeres?<br>​<b style='font-size: 1.4em'>2.</b> ¿Crees que los hombres deben ser siempre los proveedores principales de una familia, mientras que las mujeres deben encargarse del hogar?<br>​<b style='font-size: 1.4em'>3.</b> ¿Sientes que los hombres tienen el derecho de tomar decisiones importantes en la vida de una mujer (como su carrera o su vid​a socia​l)?<br>​<b style='font-size: 1.4em'>4.</b> ¿Plensas que una mujer n​o debería desafiar a un hombre en una conversación o en una situación de poder?<br>​<b style='font-size: 1.4em'>5.</b> ¿Te incomoda que una mujer tenga más éxito a reconocimiento en un área tradicionalmente dominada por hombres?",
-                answer: null
-            },
-            {
-                id: 2,
-                questionText: "¿Has ignorado o minimizado las experiencias y emociones de las mujeres?",
-                explanationTitle: "Falta de empatía o comprensión hacia las mujeres",
-                explanationText: "​<b style='font-size: 1.4em'>1.</b> ¿Te ha pasado alguna vez que no prestamos atención a lo que una mujer está diciendo, porque no crees que sea tan importante?<br>​<b style='font-size: 1.4em'>2.</b> ¿Tiendes a minimizar los problemas o preocupaciones de las mujeres en tu vida, como si no fueran tan serias o urgentes como los de los hombres?<br>​<b style='font-size: 1.4em'>3.</b> ¿Cuándo una mujer expresa molestia o tristeza, sueles pensar que está exagerando o actuando de forma irracional?<br>​<b style='font-size: 1.4em'>4.</b> ¿En una discusión, has interrumpido a una mujer para 'corregir' su opinión, sin darle espacio para que termine de expresar sus pensamientos?<br>​<b style='font-size: 1.4em'>5.</b> ¿Crees que las mujeres deben ser más 'razonables' o 'controladas' en sus reacciones emocionales, mientras que se toleran más las explosiones emocionales de los hombres?",
-                answer: null
-            },
-            {
-                id: 3,
-                questionText: "​¿Has utilizado alguna vez términos o frases que refuercen los estereotipos de género?",
-                explanationTitle: "​Uso de lenguaje sexista",
-                explanationText: "​<b style='font-size: 1.4em'>1.</b> ¿Has utilizado alguna vez términos despectivos para referirse a las mujeres, como ​'histérica​' o ​'deberías estar en la cocina​'?<br>​<b style='font-size: 1.4em'>2.</b> ¿Tienes comentarios sobre la apariencia física de las mujeres que las reducen a objetos o algo superficial?<br>​<b style='font-size: 1.4em'>3.</b> ¿Te has sentido cómodo haciendo bromas o chistes sexistas sobre las mujeres en tu círculo social?<br>​<b style='font-size: 1.4em'>4.</b> ¿Consideras que hay frases que, aunque no sean ​'malas​', pueden hacer sentir a las mujeres menospreciadas, como ​'las chicas no saben de fútbol​' o ​'tú eres muy sensible para eso​'?<br>​<b style='font-size: 1.4em'>5.</b> ¿Alguna vez has ridiculizado a una mujer por no cumplir con los estándares tradicionales de belleza o feminidad en tu conversación diaria?",
-                answer: null
-            },
-            {
-                id: 4,
-                questionText: "¿Has intentado controlar las decisiones o el comportamiento de una mujer basándote en su rol de género?",
-                explanationTitle: "Control y objetificación de las mujeres",
-                explanationText: "​<b style='font-size: 1.4em'>1.</b> ¿Alguna vez has tomado decisiones importantes por una mujer sin preguntarle su opinión, pensando que sabías que era lo mejor para ella?<br>​<b style='font-size: 1.4em'>2.</b> ¿Te has sentido con derecho a opinar sobre cómo una mujer debe vestir, lo que debe hacer o cómo debe comportarse, dependiendo de su entorno o la situación?<br>​<b style='font-size: 1.4em'>3.</b> ¿Has intentado influir en las decisiones profesionales de una mujer, como su elección de carrera, pensando que debería elegir algo ​'más adecuado​' para una mujer?<br>​<b style='font-size: 1.4em'>4.</b> ¿Piensas que las mujeres deben comportarse de una manera más ​'tradicional​' (por ejemplo, ser más sumis​as o reservadas) para que no se les critique?<br>​<b style='font-size: 1.4em'>5.</b> ¿Te parece que una mujer que toma decisiones independientes sobre su vida o su cuerpo está actuando de forma ​'incorrecta​' o desafiante hacia las normas?",
-                answer: null
-            },
-            {
-                id: 5,
-                questionText: "¿Has sentido celos o posesividad hacia las mujeres en tu vida?",
-                explanationTitle: "Celos y posesividad",
-                explanationText: "​​<b style='font-size: 1.4em'>1.</b> ¿Te molesta que una mujer pase tiempo con amigos o familiares sin tu presencia, sintiendo que no es apropiado?​<br>​<b style='font-size: 1.4em'>2.</b> ¿Sientes celos cuando una mujer tiene éxito o es admirada por otras personas, especialmente si no está relacionada contigo?​<br>​<b style='font-size: 1.4em'>3.</b> ¿Controlas las actividades de una mujer, como qué amigos pueden ver o qué lugares pueden visitar, sin darle espacio para su autonomía?<br>​<b style='font-size: 1.4em'>4.</b> ¿Tiendes a ser desconfiado hacia las mujeres que muestran Independencia a que pasan tiempo lejos de ti?​<br>​<b style='font-size: 1.4em'>5.</b> ¿Crees que es natural que un hombre se sienta celoso ​o posesivo si una mujer tiene una vida social activa o si le presta​ atención a otros hombres?",
-                answer: null
-            }
-        ];
-
-        // --- 2. VARIABLES DE ESTADO ---
-        let currentQuestionIndex = 0;
-
-        // --- 3. REFERENCIAS A ELEMENTOS DEL DOM ---
-        const questionTitleEl = document.getElementById('question-title');
-        const questionTextEl = document.getElementById('question-text');
-        const explanationTitleEl = document.getElementById('explanation-title');
-        const explanationTextEl = document.getElementById('explanation-text');
-        const ratingBar = document.getElementById('rating-bar');
-        const ratingBarFill = ratingBar.querySelector('.rating-bar-fill');
-        const prevBtn = document.getElementById('prev-btn');
-        const nextBtn = document.getElementById('next-btn');
-        const paginationContainer = document.getElementById('pagination');
-        const questionView = document.getElementById('question-view');
-        const summaryView = document.getElementById('summary-view');
-        const restartBtn = document.getElementById('restart-btn');
-        const nextBtnWrapper = document.getElementById('next-btn-wrapper');
-        const summaryFooterTextEl = document.getElementById('summary-footer-text');
-
-        // --- 4. FUNCIÓN PRINCIPAL PARA RENDERIZAR LA PREGUNTA ---
-        function renderQuestion(index) {
-            if (index < 0 || index >= questions.length) return;
-
-            currentQuestionIndex = index;
-            const question = questions[index];
-
-            questionTitleEl.textContent = `Pregunta #${question.id}`;
-            questionTextEl.textContent = question.questionText;
-            explanationTitleEl.textContent = question.explanationTitle;
-            explanationTextEl.innerHTML = question.explanationText;
-
-            // Actualizar la barra de calificación con la respuesta guardada
-            updateRatingBar(question.answer);
-
-            prevBtn.disabled = index === 0;
-
-            // El botón "Siguiente" o "Generar Resumen" estará deshabilitado si no hay respuesta
-            if (index === questions.length - 1) {
-                nextBtn.textContent = 'Generar Resumen';
-            } else {
-                nextBtn.textContent = 'Siguiente';
-            }
-            nextBtn.disabled = question.answer === null;
-
-            updatePagination();
-        }
-
-        // --- 5. FUNCIONES AUXILIARES ---
-
-        function createPagination() {
-            questions.forEach((_, index) => {
-                const pageNumber = document.createElement('div');
-                pageNumber.classList.add('page-number');
-                pageNumber.textContent = index + 1;
-                pageNumber.dataset.index = index;
-                paginationContainer.appendChild(pageNumber);
-            });
-        }
-
-        function updatePagination() {
-            const pageNumbers = paginationContainer.querySelectorAll('.page-number');
-            let enabled = true; // La primera pregunta siempre está habilitada
-            pageNumbers.forEach(pn => {
-                const index = parseInt(pn.dataset.index);
-                pn.classList.toggle('current', index === currentQuestionIndex);
-
-                // Un número de página está habilitado si la pregunta anterior fue respondida
-                const isEnabled = (index === 0) || questions[index - 1].answer !== null;
-                pn.classList.toggle('disabled', !isEnabled);
-
-
-            });
-        }
-        
-        // Función para actualizar la barra de calificación (con animación)
-        function updateRatingBar(value) {
-            const segments = ratingBar.querySelectorAll('.rating-bar-segment');
-            
-            // Limpia clases de color anteriores
-            ratingBarFill.classList.remove('color-1', 'color-2', 'color-3', 'color-4', 'color-5');
-
-            if (value === null) {
-                ratingBarFill.style.width = '0%';
-                ratingBar.classList.remove('selected');
-            } else {
-                // Añade la clase de color correspondiente
-                ratingBarFill.classList.add(`color-${value}`);
-                // La animación se activa al cambiar el ancho
-                ratingBarFill.style.width = `${value * 20}%`;
-                ratingBar.classList.add('selected');
-            }
-
-            // Actualiza el estilo de los números
-            segments.forEach(segment => {
-                const segmentValue = parseInt(segment.dataset.value);
-                segment.classList.toggle('active', value !== null && segmentValue <= value);
-            });
-        }
-
-        // Función para mostrar la vista de resumen
-        function showSummary() {
-            // Ocultar vista de preguntas y navegación
-            questionView.classList.add('hidden');
-            paginationContainer.classList.add('hidden');
-            document.querySelector('.navigation-buttons').classList.add('hidden');
-
-            // Mostrar vista de resumen
-            summaryView.classList.remove('hidden');
-
-            // Actualizar página derecha
-            explanationTitleEl.classList.add('hidden'); // Ocultamos el título
-            explanationTextEl.classList.remove('hidden'); // Nos aseguramos que el texto sea visible
-            explanationTextEl.innerHTML = "<b style='font-size: 1.6em;'>Gracias por regalarte este tiempo para tomar conciencia sobre tu propio pensamiento y conductas.<br>Te invitamos a reflexionar con base a tus respuestas y seguir documentándote sobre este tema tan importante para la sana convivencia en el hogar, trabajo y tu comunidad.</b>";
-
-            // Generar la barra de resumen
-            const summaryBar = document.getElementById('summary-bar');
-            summaryFooterTextEl.classList.remove('hidden'); // Mostrar el texto del pie de página
-            summaryBar.innerHTML = ''; // Limpiar contenido anterior
-
-            questions.forEach(q => {
-                const segment = document.createElement('div');
-                segment.classList.add('summary-segment');
-                if (q.answer !== null) {
-                    // Usamos las mismas clases de color que la barra de llenado
-                    segment.classList.add(`color-${q.answer}`);
-                    segment.textContent = q.answer;
-                } else {
-                    segment.textContent = '-'; // Si no hay respuesta
-                    segment.style.backgroundColor = '#e9ecef';
-                    segment.style.color = '#000';
-                }
-                summaryBar.appendChild(segment);
-            });
-        }
-
-        // Función para reiniciar el cuestionario
-        function restartQuiz() {
-            // Limpiar respuestas
-            questions.forEach(q => q.answer = null);
-
-            // Ocultar vista de resumen
-            summaryView.classList.add('hidden');
-
-            // Mostrar vista de preguntas y navegación
-            questionView.classList.remove('hidden');
-            paginationContainer.classList.remove('hidden');
-            document.querySelector('.navigation-buttons').classList.remove('hidden');
-            summaryFooterTextEl.classList.add('hidden'); // Ocultar el texto del pie de página
-            
-            // Volvemos a mostrar los elementos de la página derecha
-            explanationTitleEl.classList.remove('hidden');
-
-            // Volver a la primera pregunta
-            renderQuestion(0);
-        }
-
-        // --- 6. MANEJADORES DE EVENTOS ---
-
-        nextBtn.addEventListener('click', () => {
-            const currentQuestion = questions[currentQuestionIndex];
-            // Si no hay respuesta, muestra un mensaje y no avances.
-            if (currentQuestion.answer === null) {
-                const originalTitle = explanationTitleEl.textContent;
-                const originalText = explanationTextEl.innerHTML;
-
-                explanationTitleEl.textContent = "¡Un momento!";
-                explanationTextEl.innerHTML = "Por favor, califica la pregunta actual del 1 al 5 en el panel izquierdo para poder continuar.<br><br>Tu respuesta es importante para completar el ejercicio de reflexión.";
-
-                // Restaura el contenido original después de unos segundos
-                setTimeout(() => {
-                    explanationTitleEl.textContent = originalTitle;
-                    explanationTextEl.innerHTML = originalText;
-                }, 4000); // El mensaje se mostrará por 4 segundos
-
-                return; // Detiene la ejecución para no pasar a la siguiente pregunta
-            }
-
-            // Si hay respuesta, procede normalmente
-            if (currentQuestionIndex === questions.length - 1) { // Si es la última pregunta
-                showSummary();
-            } else {
-                renderQuestion(currentQuestionIndex + 1);
-            }
-        });
-        prevBtn.addEventListener('click', () => renderQuestion(currentQuestionIndex - 1));
-
-        paginationContainer.addEventListener('click', (e) => {
-            // Solo permite la navegación si el número de página no está deshabilitado
-            if (e.target.classList.contains('page-number') && !e.target.classList.contains('disabled')) {
-                const index = parseInt(e.target.dataset.index);
-                renderQuestion(index);
-            }
-        });
-        
-        // Guardar respuesta al hacer clic en la barra de calificación
-        ratingBar.addEventListener('click', (e) => {
-            const segment = e.target.closest('.rating-bar-segment');
-            if (segment) {
-                const value = parseInt(segment.dataset.value);
-                questions[currentQuestionIndex].answer = value;
-                updateRatingBar(value); // Llama a la función que activa la animación
-                nextBtn.disabled = false; // Habilita el botón de siguiente
-                console.log(`Respuesta para la pregunta ${currentQuestionIndex + 1}: ${value}`);
-            }
-        });
-
-        // --- NUEVO: MANEJADORES PARA EL TOOLTIP DEL BOTÓN "SIGUIENTE" ---
-        function handleTooltip(show) {
-            // Solo muestra el tooltip si el botón está realmente deshabilitado
-            if (show && nextBtn.disabled) {
-                nextBtnWrapper.classList.add('show-tooltip');
-            } else {
-                nextBtnWrapper.classList.remove('show-tooltip');
-            }
-        }
-
-        // Mostrar en hover (escritorio) o al hacer clic (móvil)
-        nextBtnWrapper.addEventListener('mouseenter', () => handleTooltip(true));
-        nextBtnWrapper.addEventListener('mouseleave', () => handleTooltip(false));
-        nextBtnWrapper.addEventListener('click', () => handleTooltip(true));
-
-        restartBtn.addEventListener('click', restartQuiz);
-
-        // --- 7. INICIALIZACIÓN ---
-        createPagination();
-        renderQuestion(0); // Muestra la primera pregunta al cargar
-    });
-    </script>
 </div>
