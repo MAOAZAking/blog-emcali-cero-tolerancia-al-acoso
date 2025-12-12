@@ -61,6 +61,11 @@
             flex-direction: column;
         }
         
+        /* Ocultar resumen y texto final por defecto */
+        #summary-view, #summary-footer-text {
+            display: none;
+        }
+
         /* Contenedor para las páginas de preguntas (inicialmente ocultas) */
         .question-page {
             display: none; /* Oculto por defecto */
@@ -322,7 +327,7 @@
             cursor: pointer;
             font-size: 1.1em;
             margin-top: 20px;
-            align-self: center; /* Centra el botón */
+            align-self: left;
         }
 
         /* --- NUEVO: ESTILO PARA EL TEXTO FINAL DEL RESUMEN --- */
@@ -347,8 +352,7 @@
         #nav-q2:checked ~ .book-container .question-page-2,
         #nav-q3:checked ~ .book-container .question-page-3,
         #nav-q4:checked ~ .book-container .question-page-4,
-        #nav-q5:checked ~ .book-container .question-page-5,
-        #nav-summary:checked ~ .book-container #summary-view {
+        #nav-q5:checked ~ .book-container .question-page-5 {
             display: flex;
             flex-direction: column;
         }
@@ -362,10 +366,10 @@
             display: block;
         }
 
-        /* Ocultar navegación en el resumen */
-        #nav-summary:checked ~ .book-container .navigation-buttons,
-        #nav-summary:checked ~ .book-container .pagination {
-            display: none;
+        /* Mostrar la vista de resumen en la página izquierda */
+        #nav-summary:checked ~ .book-container .left-page #summary-view {
+            display: flex;
+            flex-direction: column;
         }
 
         /* Mostrar texto de pie de página en el resumen */
@@ -373,19 +377,23 @@
             display: block;
         }
 
+
+        /* Ocultar navegación en el resumen */
+        #nav-summary:checked ~ .book-container .navigation-buttons,
+        #nav-summary:checked ~ .book-container .pagination {
+            display: none;
+        }
+
+        /* Mostrar texto de pie de página en el resumen */
         /* Lógica de la barra de calificación y habilitación del botón "Siguiente" */
         .question-page .rating-input { display: none; }
 
-        /* Ocultar el botón "Siguiente" real por defecto */
-        .next-btn-real { display: none; }
+        /* Mostrar siempre el botón "Siguiente" real */
+        .next-btn-real { display: inline-block; }
 
-        /* Cuando se selecciona una respuesta, se muestra el botón "Siguiente" real y se oculta el tooltip */
-        .question-page input[class^="rating-q"]:checked ~ .navigation-buttons .next-btn-real, .question-page input[class^="rating-q"]:checked ~ .navigation-buttons + .navigation-buttons .next-btn-real {
-            display: inline-block;
-        }
-        .question-page input[class^="rating-q"]:checked ~ .navigation-buttons .tooltip-wrapper, .question-page input[class^="rating-q"]:checked ~ .navigation-buttons + .navigation-buttons .tooltip-wrapper {
-            display: none;
-        }
+        /* Ocultar siempre el wrapper del tooltip */
+        .tooltip-wrapper { display: none; }
+
 
         /* Colorear la barra de calificación según la respuesta */
         .rating-input-1:checked ~ .answer-section .rating-bar-container .rating-bar-fill { width: 20%; background-color: #cdff1a; }
@@ -448,7 +456,7 @@
 
         /* Estilos de paginación actualizados por JS */
         .pagination .page-number { display: none; }
-        .pagination .page-number.visible { display: flex; }
+        /* .pagination .page-number.visible { display: flex; } */
         .pagination .page-number.active { background-color: #0d5c1f; color: white; border-color: #13cc3e; }
 
         /* Ocultar botones de navegación específicos */
@@ -644,11 +652,6 @@
             </div>
 
             <!-- Vista de Resumen (inicialmente oculta) -->
-            <div id="summary-view" class="hidden">
-                <h2 id="summary-title">Resumen de tus Respuestas</h2>
-                <div class="summary-bar" id="summary-bar"></div>
-                <a href="" class="restart-btn nav-btn">Reiniciar Cuestionario</a>
-            </div>
 
             <div class="pagination">
                 <label for="nav-q1" class="page-number page-number-1">1</label>
@@ -688,87 +691,11 @@
             </div>
             <!-- Explicación del Resumen -->
             <div class="explanation-content explanation-summary">
-                <p id="explanation-text"><b style='font-size: 1.6em;'>Gracias por regalarte este tiempo para tomar conciencia sobre tu propio pensamiento y conductas.<br>Te invitamos a reflexionar con base a tus respuestas y seguir documentándote sobre este tema tan importante para la sana convivencia en el hogar, trabajo y tu comunidad.</b></p>
+                <p id="explanation-text"><b style='font-size: 1.2em;'>Gracias por regalarte este tiempo para tomar conciencia sobre tu propio pensamiento y conductas.<br>Te invitamos a reflexionar con base a tus respuestas y seguir documentándote sobre este tema tan importante para la sana convivencia en el hogar, trabajo y tu comunidad.</b></p>
             </div>
         </div>
-        <div id="summary-footer-text" class="hidden">
+        <div id="summary-footer-text">
                 Porque el verdadero cambio <span style="color: #13cc3e;">COMIENZA DESDE ADENTRO</span>
         </div>
     </div>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const totalQuestions = 5;
-            const answers = {};
-
-            // Función para actualizar la visibilidad de los botones y la paginación
-            function updateNavAndPagination(questionNumber) {
-                const questionPage = document.querySelector(`.question-page-${questionNumber}`);
-                if (!questionPage) return;
-
-                const nextButtonReal = questionPage.querySelector('.next-btn-real');
-                const tooltipWrapper = questionPage.querySelector('.tooltip-wrapper');
-
-                // Habilitar el botón "Siguiente" si hay respuesta
-                if (answers[`q${questionNumber}`]) {
-                    if (nextButtonReal) nextButtonReal.style.display = 'inline-block';
-                    if (tooltipWrapper) tooltipWrapper.style.display = 'none';
-
-                    // Mostrar el siguiente número de página
-                    if (questionNumber < totalQuestions) {
-                        const nextPageNumber = document.querySelector(`.page-number-${questionNumber + 1}`);
-                        if (nextPageNumber) nextPageNumber.classList.add('visible');
-                    }
-                } else {
-                    if (nextButtonReal) nextButtonReal.style.display = 'none';
-                    if (tooltipWrapper) tooltipWrapper.style.display = 'inline-block';
-                }
-            }
-
-            // Función para actualizar el estado activo de la paginación
-            function updatePaginationActiveState() {
-                const currentNav = document.querySelector('input[name="nav-question"]:checked');
-                const currentId = currentNav.id; // ej: "nav-q2"
-
-                document.querySelectorAll('.pagination .page-number').forEach(pn => {
-                    pn.classList.remove('active');
-                });
-
-                if (currentId.startsWith('nav-q')) {
-                    const qNum = currentId.split('-q')[1];
-                    const activePageNumber = document.querySelector(`.page-number-${qNum}`);
-                    if (activePageNumber) {
-                        activePageNumber.classList.add('active');
-                    }
-                }
-            }
-
-            // Añadir listeners a todos los inputs de calificación
-            for (let i = 1; i <= totalQuestions; i++) {
-                document.querySelectorAll(`input[name="rating-q${i}"]`).forEach(input => {
-                    input.addEventListener('change', function() {
-                        answers[`q${i}`] = this.value;
-                        updateNavAndPagination(i);
-                    });
-                });
-            }
-
-            // Añadir listeners a los radio de navegación para actualizar el estado
-            document.querySelectorAll('input[name="nav-question"]').forEach(navRadio => {
-                navRadio.addEventListener('change', function() {
-                    const qNumMatch = this.id.match(/nav-q(\d+)/);
-                    if (qNumMatch) {
-                        const qNum = parseInt(qNumMatch[1], 10);
-                        updateNavAndPagination(qNum);
-                    }
-                    updatePaginationActiveState();
-                });
-            });
-
-            // Inicialización al cargar la página
-            updateNavAndPagination(1);
-            updatePaginationActiveState();
-            document.querySelector('.page-number-1').classList.add('visible');
-        });
-    </script>
 </div>
