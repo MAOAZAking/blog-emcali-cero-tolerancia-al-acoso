@@ -530,6 +530,10 @@
             display: flex;
         }
 
+        .page left-page {
+            opacity: 0;
+        }
+
 
     </style>
 
@@ -569,6 +573,11 @@
 
             <!-- Pregunta 1 -->
             <div class="question-page question-page-1">
+                <input type="radio" id="q1-rating-1" name="rating-q1" class="rating-input rating-q1 rating-input-1" value="1">
+                <input type="radio" id="q1-rating-2" name="rating-q1" class="rating-input rating-q1 rating-input-2" value="2">
+                <input type="radio" id="q1-rating-3" name="rating-q1" class="rating-input rating-q1 rating-input-3" value="3">
+                <input type="radio" id="q1-rating-4" name="rating-q1" class="rating-input rating-q1 rating-input-4" value="4">
+                <input type="radio" id="q1-rating-5" name="rating-q1" class="rating-input rating-q1 rating-input-5" value="5">
                 <div class="question-content">
                     <h2 id="question-title">Pregunta #1</h2>
                     <p id="question-text">¿Has pensado alguna vez que los hombres son naturalmente superiores a las mujeres?</p>
@@ -597,6 +606,11 @@
 
             <!-- Pregunta 2 -->
             <div class="question-page question-page-2">
+                <input type="radio" id="q2-rating-1" name="rating-q2" class="rating-input rating-q2 rating-input-1" value="1">
+                <input type="radio" id="q2-rating-2" name="rating-q2" class="rating-input rating-q2 rating-input-2" value="2">
+                <input type="radio" id="q2-rating-3" name="rating-q2" class="rating-input rating-q2 rating-input-3" value="3">
+                <input type="radio" id="q2-rating-4" name="rating-q2" class="rating-input rating-q2 rating-input-4" value="4">
+                <input type="radio" id="q2-rating-5" name="rating-q2" class="rating-input rating-q2 rating-input-5" value="5">
                 <div class="question-content">
                     <h2 id="question-title">Pregunta #2</h2>
                     <p id="question-text">¿Has ignorado o minimizado las experiencias y emociones de las mujeres?</p>
@@ -624,6 +638,11 @@
 
             <!-- Pregunta 3 -->
             <div class="question-page question-page-3">
+                <input type="radio" id="q3-rating-1" name="rating-q3" class="rating-input rating-q3 rating-input-1" value="1">
+                <input type="radio" id="q3-rating-2" name="rating-q3" class="rating-input rating-q3 rating-input-2" value="2">
+                <input type="radio" id="q3-rating-3" name="rating-q3" class="rating-input rating-q3 rating-input-3" value="3">
+                <input type="radio" id="q3-rating-4" name="rating-q3" class="rating-input rating-q3 rating-input-4" value="4">
+                <input type="radio" id="q3-rating-5" name="rating-q3" class="rating-input rating-q3 rating-input-5" value="5">
                 <div class="question-content">
                     <h2 id="question-title">Pregunta #3</h2>
                     <p id="question-text">​¿Has utilizado alguna vez términos o frases que refuercen los estereotipos de género?</p>
@@ -651,6 +670,11 @@
 
             <!-- Pregunta 4 -->
             <div class="question-page question-page-4">
+                <input type="radio" id="q4-rating-1" name="rating-q4" class="rating-input rating-q4 rating-input-1" value="1">
+                <input type="radio" id="q4-rating-2" name="rating-q4" class="rating-input rating-q4 rating-input-2" value="2">
+                <input type="radio" id="q4-rating-3" name="rating-q4" class="rating-input rating-q4 rating-input-3" value="3">
+                <input type="radio" id="q4-rating-4" name="rating-q4" class="rating-input rating-q4 rating-input-4" value="4">
+                <input type="radio" id="q4-rating-5" name="rating-q4" class="rating-input rating-q4 rating-input-5" value="5">
                 <div class="question-content">
                     <h2 id="question-title">Pregunta #4</h2>
                     <p id="question-text">¿Has intentado controlar las decisiones o el comportamiento de una mujer basándote en su rol de género?</p>
@@ -678,6 +702,11 @@
 
             <!-- Pregunta 5 -->
             <div class="question-page question-page-5">
+                <input type="radio" id="q5-rating-1" name="rating-q5" class="rating-input rating-q5 rating-input-1" value="1">
+                <input type="radio" id="q5-rating-2" name="rating-q5" class="rating-input rating-q5 rating-input-2" value="2">
+                <input type="radio" id="q5-rating-3" name="rating-q5" class="rating-input rating-q5 rating-input-3" value="3">
+                <input type="radio" id="q5-rating-4" name="rating-q5" class="rating-input rating-q5 rating-input-4" value="4">
+                <input type="radio" id="q5-rating-5" name="rating-q5" class="rating-input rating-q5 rating-input-5" value="5">
                 <div class="question-content">
                     <h2 id="question-title">Pregunta #5</h2>
                     <p id="question-text">¿Has sentido celos o posesividad hacia las mujeres en tu vida?</p>
@@ -708,7 +737,7 @@
             <div id="summary-view">
                 <h2 id="summary-title">Resumen de tus Respuestas</h2>
                 <div class="summary-bar" id="summary-bar">
-                    <div class="summary-segment-container">
+                    <div class="summary-segment-container" data-question="1">
                         <div class="summary-segment summary-q1-1 color-1">1</div>
                         <div class="summary-segment summary-q1-2 color-2">2</div>
                         <div class="summary-segment summary-q1-3 color-3">3</div>
@@ -716,7 +745,7 @@
                         <div class="summary-segment summary-q1-5 color-5">5</div>
                     </div>
                     <!-- Segmento para Pregunta 2 -->
-                    <div class="summary-segment-container">
+                    <div class="summary-segment-container" data-question="2">
                         <div class="summary-segment summary-q2-1 color-1">1</div>
                         <div class="summary-segment summary-q2-2 color-2">2</div>
                         <div class="summary-segment summary-q2-3 color-3">3</div>
@@ -724,7 +753,7 @@
                         <div class="summary-segment summary-q2-5 color-5">5</div>
                     </div>
                     <!-- Segmento para Pregunta 3 -->
-                    <div class="summary-segment-container">
+                    <div class="summary-segment-container" data-question="3">
                         <div class="summary-segment summary-q3-1 color-1">1</div>
                         <div class="summary-segment summary-q3-2 color-2">2</div>
                         <div class="summary-segment summary-q3-3 color-3">3</div>
@@ -732,7 +761,7 @@
                         <div class="summary-segment summary-q3-5 color-5">5</div>
                     </div>
                     <!-- Segmento para Pregunta 4 -->
-                    <div class="summary-segment-container">
+                    <div class="summary-segment-container" data-question="4">
                         <div class="summary-segment summary-q4-1 color-1">1</div>
                         <div class="summary-segment summary-q4-2 color-2">2</div>
                         <div class="summary-segment summary-q4-3 color-3">3</div>
@@ -740,7 +769,7 @@
                         <div class="summary-segment summary-q4-5 color-5">5</div>
                     </div>
                     <!-- Segmento para Pregunta 5 -->
-                    <div class="summary-segment-container">
+                    <div class="summary-segment-container" data-question="5">
                         <div class="summary-segment summary-q5-1 color-1">1</div>
                         <div class="summary-segment summary-q5-2 color-2">2</div>
                         <div class="summary-segment summary-q5-3 color-3">3</div>
