@@ -16,11 +16,6 @@
             margin: 0;
         }
 
-        /* Ocultar los radio buttons de navegación */
-        .nav-radio {
-            display: none;
-        }
-
         /* Contenedor principal con diseño de libro */
         .book-container {
             display: flex;
@@ -54,16 +49,6 @@
             display: flex;
             flex-direction: column;
         }
-       
-        /* Ocultar resumen y texto final por defecto */
-        #summary-view, #summary-footer-text {
-            display: none;
-        }
-
-        /* Contenedor para las páginas de preguntas (inicialmente ocultas) */
-        .question-page {
-            display: none; /* Oculto por defecto */
-        }
 
         /* Clase para ocultar elementos */
         .hidden {
@@ -73,6 +58,10 @@
         /* Línea divisoria para simular el centro del libro */
         .left-page {
             border-right: 1px solid #ddd;
+        }
+
+        .question-content {
+            flex-grow: 1; /* Ocupa el espacio disponible */
         }
 
         #question-title {
@@ -144,7 +133,7 @@
             color: #000000;
             font-weight: bold;
         }
-       
+        
         /* Cambia el color del número cuando la barra pasa por encima */
         .rating-bar-container.selected .rating-bar-segment.active span {
             color: rgb(255, 255, 255);
@@ -164,14 +153,13 @@
             margin-bottom: 20px;
         }
 
-        .nav-btn {
+        #prev-btn, #next-btn {
             padding: 10px 20px;
             border: none;
             color: white;
             border-radius: 5px;
             cursor: pointer;
             font-size: 1em;
-            text-align: center;
         }
 
         #prev-btn {
@@ -183,7 +171,7 @@
             color: #000;
         }
 
-        .nav-btn.disabled {
+        #prev-btn:disabled, #next-btn:disabled {
             background-color: #686868;
             cursor: not-allowed;
         }
@@ -248,14 +236,14 @@
         }
 
         /* Estilo para el número de página actual */
-        .page-number.active {
+        .page-number.current {
             background-color: #0d5c1f;
             color: rgb(211, 211, 211);
             font-size: 1em;
             border-color: #13cc3e;
         }
 
-        /* Estilo para paginación deshabilitada */
+        /* --- NUEVO: Estilo para paginación deshabilitada --- */
         .page-number.disabled {
             opacity: 0.5;
             cursor: not-allowed;
@@ -265,11 +253,6 @@
         .right-page {
             background-color: transparent; /* Hacer transparente para ver el fondo del contenedor */
             position: relative; /* Necesario para posicionar el texto del pie de página del resumen */
-        }
-
-        /* Ocultar todas las explicaciones por defecto */
-        .explanation-content {
-            display: none;
         }
 
         #explanation-title {
@@ -311,7 +294,7 @@
             text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
         }
 
-        .restart-btn {
+        #restart-btn {
             padding: 12px 25px;
             border: none;
             background: linear-gradient(to bottom right, #13cc3e, #0d5c1f);
@@ -321,7 +304,7 @@
             cursor: pointer;
             font-size: 1.1em;
             margin-top: 20px;
-            align-self: left;
+            align-self: center; /* Centra el botón */
         }
 
         /* --- NUEVO: ESTILO PARA EL TEXTO FINAL DEL RESUMEN --- */
